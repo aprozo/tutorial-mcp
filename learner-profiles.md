@@ -1,5 +1,6 @@
 ---
-title: FIXME
+title: 'Learner Profiles'
 ---
 
-This is a placeholder file. Please add content here. 
+This lesson targets graduate students and researchers new to AI tooling — see the
+[Setup](../learners/setup.md) page.
