@@ -188,8 +188,11 @@ The EIC runs an [LXR source cross-reference browser](https://eic-code-browser.sd
 
 In Episode 3 you configured your own client. The collaboration also provides a hosted alternative: **DISpatcher**, a Mattermost bot in an open channel — [chat.epic-eic.org → `dispatcher`](https://chat.epic-eic.org/main/channels/dispatcher) — that anyone in ePIC can use, in the channel or by DM. All the complexity you just learned about lives in its back end; you need nothing but your Mattermost account. It is wired to **roughly 100 MCP tools**: production diagnostics (PanDA — why did my jobs fail?), the physics samples in production (PCS), the data tools you used in this lesson (rucio, xrootd, uproot), software knowledge (LXR + GitHub), and documents (Zenodo, plus a documentation RAG).
 
+Post this in the `dispatcher` channel (or DM the bot) — not in your own assistant, which has no
+PCS tool and would have to invent the answer:
+
 ```{.ai-prompt}
-(in the dispatcher channel)  Summarise the physics tags in the PCS — which processes are covered, and which tags are still draft?
+Summarise the physics tags in the PCS — which processes are covered, and which tags are still draft?
 ```
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout

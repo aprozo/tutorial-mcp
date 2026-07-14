@@ -152,6 +152,12 @@ browse those with `XROOTD_SERVER=root://dtn-eic.jlab.org XROOTD_BASE_DIR=/volati
 eic-mcp restart` (a plain `up` skips servers that are already running, so the new setting would
 never take effect). Either way, `rucio` replicas always tell you where a file really is.
 
+If instead *every* uproot call starts timing out after one big one, the server is **busy, not
+broken**: it handles one request at a time, and a call your client gave up on is still running.
+Wait a minute, or clear it with `EIC_MCP_SERVERS=uproot eic-mcp restart`. Do not let the assistant
+"work around" it by installing packages or reading the file itself — `AGENTS.md` (Episode 4)
+forbids exactly that.
+
 :::::::::::::::
 
 ## Connect the assistant
@@ -272,7 +278,7 @@ server's `list_campaigns` — gets the honest answer.
 With `rucio` and `xrootd` connected (no credentials — see the callout), ask your assistant:
 
 ```{.ai-prompt}
-Use the rucio tools to find the ePIC reconstructed-DIS dataset for the BeAGLE eCu 10x115 GeV sample in campaign 26.04.1, list its files, then use the xrootd tools to confirm those files exist on the store and report the total number of events.
+Use the rucio tools to find the ePIC reconstructed-DIS dataset for the BeAGLE eCu ep 10x115 GeV sample in campaign 26.04.1, list its files, then use the xrootd tools to confirm those files exist on the store and report the total number of events.
 ```
 
 ::::::::::::::: solution
@@ -302,7 +308,7 @@ one of the `root://` URLs from the previous exercise — written below as `root:
 Issue the request:
 
 ```{.ai-prompt}
-Using the uproot tools, report the structure of root://epicxrd1.sdcc.bnl.gov:1095//<your-discovered-file>.root and list the members of the ReconstructedChargedParticles collection.
+Using the uproot tools, report the structure of the events tree in root://epicxrd1.sdcc.bnl.gov:1095//<your-discovered-file>.root and list the members of the ReconstructedChargedParticles collection.
 ```
 
 ::::::::::::::: solution

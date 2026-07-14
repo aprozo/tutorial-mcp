@@ -114,10 +114,11 @@ With the three servers running and the lambda-fit skill available, one request r
 Using the lambda-fit skill, measure the Lambda0 peak in this file:
 root://epicxrd1.sdcc.bnl.gov:1095//... (one of the dataset's root:// files).
 Build the proton-pion invariant-mass histogram with the uproot MCP server (tree 'events'),
-fit it, and report mu, sigma, the yield, and chi2/ndf, with the plot.
+fit it, and report mu, sigma, the yield, and chi2/ndf, with the plot — or report insufficient
+statistics if the fit window is too sparse.
 ```
 
-The assistant calls `execute_kernel` (tree `events`, proton/pion branches) to build the histogram, then a follow-up prompt fits it with a Gaussian-plus-polynomial model. On a single file the peak sits at $\mu \approx 1.1157$ GeV; its significance is limited by the small event count, addressed next.
+The assistant calls `execute_kernel` (tree `events`, proton/pion branches) to build the histogram, then a follow-up prompt fits it with a Gaussian-plus-polynomial model. One file yields only ~8 candidates in the fit window, so the honest answer is *insufficient statistics* — the skill says stop rather than fit, and a model that quotes $\mu$ anyway has ignored it. The peak at $\mu \approx 1.1157$ GeV comes from the fuller sample below.
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
 
@@ -132,7 +133,7 @@ A capable model uses `execute_kernel` as instructed. A cheaper model may reach f
 The same kernel applies unchanged to many files; only the tool differs. `execute_kernel` runs one file; `execute_kernel_dataset` dispatches the identical kernel across a whole file list and returns one merged histogram, so peak memory is independent of dataset size. Enumerate the files with `get_dataset_file_list`, then fan the kernel out:
 
 ```{.ai-prompt}
-Using the lambda-fit skill, run the same proton-pion mass kernel across the dataset's files
+Using the lambda-fit skill, run the same proton-pion mass kernel across the first 8 of the dataset's files
 with execute_kernel_dataset (tree 'events'), merge the histograms, then fit the result and
 report mu, sigma, the yield, and chi2/ndf for both Lambda and anti-Lambda, with the plot.
 ```
@@ -177,7 +178,7 @@ Before treating an automated result as final, confirm it meets the skill's crite
 ## Exercises (specification)
 
 * Run the single-file chain through your assistant and report $\mu$, $\sigma$, $S$, and $\chi^2/\text{ndf}$.
-* Process 10 files with `execute_kernel_dataset` and compare the fitted parameters to the ~100-file result; comment on the change in statistical uncertainty.
+* Process 8 files with `execute_kernel_dataset` and compare the fitted parameters to the ~100-file result; comment on the change in statistical uncertainty. (More than that, and the synchronous call outlives your client's tool timeout — go async with `submit_kernel_dataset`.)
 * Complete the audit checklist for your run, attaching the recorded tool calls as provenance.
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
