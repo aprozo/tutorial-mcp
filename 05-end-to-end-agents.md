@@ -47,100 +47,108 @@ pre.ai-prompt::before, div.sourceCode.ai-prompt::before {
 
 ::::::::::::::::::::::::::::::::::::::::::::: questions
 
-- How do assistant + server + skill compose into one analysis?
-- How does the kernel scale from one file to the full sample?
-- How is the yield extracted and made reproducible?
+- How do the assistant, the servers, and the skill work together?
+- How does the analysis run over many files?
+- How is the yield extracted and recorded?
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::: objectives
 
-- Set up any MCP client for the end-to-end run in three commands.
-- Pick the right kernel tool for the sample size (`execute_kernel` vs `execute_kernel_dataset`).
-- Sign off — or reject — an agent-produced yield using the audit checklist.
+- Set up an MCP client for the analysis.
+- Scale the analysis from one file to a full dataset.
+- Accept or reject an agent-produced yield using the audit checklist.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
 ## Run it in your client
 
-Everything below runs from the same three-step setup, whatever assistant you use:
+In eic-shell, in your analysis directory:
 
-1. Inside eic-shell, start the servers: `eic-mcp up`.
-2. In your analysis directory, connect your client and put the Episode 4 files in place:
+```bash
+eic-mcp up
+eic-mcp config opencode
+R=https://raw.githubusercontent.com/eic/tutorial-mcp/main/files/skills
+curl -fsSLO $R/AGENTS.md
+curl -fsSL --create-dirs -o .opencode/skills/lambda-fit/SKILL.md $R/lambda-fit/SKILL.md
+opencode
+```
 
-   ```bash
-   eic-mcp config opencode > opencode.jsonc
-   cp /path/to/tutorial-mcp/files/skills/AGENTS.md .
-   mkdir -p skills
-   cp -r /path/to/tutorial-mcp/files/skills/lambda-fit skills/
-   ```
+Check that `/mcp` lists `uproot`, `xrootd`, and `rucio`, then paste the prompts below. For Claude
+Code, use `eic-mcp config claude` and `.claude/skills/`.
 
-3. Launch `opencode`, check `/mcp` lists `uproot`, `xrootd`, and `rucio`, and paste the pipeline
-   prompt below.
+## The pipeline
 
-::::::::::::::: callout
-
-## Same pipeline, other clients
-
-Only step 2 changes: `eic-mcp config copilot > .vscode/mcp.json` (VS Code/Copilot, Agent mode),
-`eic-mcp config cursor > .cursor/mcp.json`, `eic-mcp config claude > .mcp.json` (Claude Code),
-`eic-mcp config gemini > .gemini/settings.json` (Gemini CLI), or
-`eic-mcp config codex >> ~/.codex/config.toml` (Codex). The servers, skills, and prompts are
-identical.
-
-:::::::::::::::
-
-## The composed pipeline
-
-The previous episodes combine into one procedure run from a single request: the lambda-fit skill (Episode 4) supplies the steps, the [uproot tool server](https://github.com/eic/uproot-mcp-server) (Episode 3) supplies verifiable data access, and the agentic loop (Episode 1) carries it out and checks the result.
+The skill (Episode 4) lists the steps, the uproot server (Episode 3) reads the data, and the agent loop (Episode 1) runs and checks them.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'fontSize':'15px','lineColor':'#94a3b8','edgeLabelBackground':'#e2e8f0','clusterBkg':'#1f293720','clusterBorder':'#94a3b8','titleColor':'#94a3b8'}}}%%
 flowchart LR
     accTitle: {End-to-end agent run}
     accDescr: {End-to-end agent run}
-    A["resolve input<br/>root:// file or file list"]:::data --> B["build m(p,π) histogram<br/>uproot MCP · execute_kernel"]:::tool
-    B --> C["fit Gaussian + poly-2<br/>opencode prompt"]:::tool
+    A["resolve input<br/>root:// file or file list"]:::data --> B["build m(p,π) histogram<br/>uproot MCP"]:::tool
+    B --> C["fit Gaussian + poly-2<br/>uproot MCP"]:::tool
     C --> D["report μ, σ, S, χ²/ndf<br/>+ plot + provenance"]:::out
     classDef data fill:#fff4e0,stroke:#f08c00,stroke-width:1.5px,color:#5c3b00;
     classDef tool fill:#e6f7ed,stroke:#2f9e44,stroke-width:1.5px,color:#0b3d1f;
     classDef out fill:#f3e8ff,stroke:#7048e8,stroke-width:1.5px,color:#2e1065;
 ```
 
-## One file, end to end
+## One file
 
-With the three servers running and the lambda-fit skill available, one request runs the whole chain. Point it at one of the dataset's `root://` files. The assistant uses `rucio` tools to find a DIS dataset and `list_file_replicas` for the URLs, `xrootd` to confirm the file is there, then reads it in place:
+Give the assistant one `root://` file from the dataset you found in Episode 3:
 
 ```{.ai-prompt}
 Using the lambda-fit skill, measure the Lambda0 peak in this file:
-root://dtn-eic.jlab.org//... (one of the dataset's root:// files).
+root://epicxrd1.sdcc.bnl.gov:1095//... (one root:// file of the campaign 26.04.1
+BeAGLE eCu ep 10x115 dataset from Episode 3's exercise).
 Build the proton-pion invariant-mass histogram with the uproot MCP server (tree 'events'),
-fit it, and report mu, sigma, the yield, and chi2/ndf, with the plot.
+fit it, and report mu, sigma, the yield, and chi2/ndf, with the plot, or report insufficient
+statistics if the fit window is too sparse.
 ```
 
-The assistant calls `execute_kernel` (tree `events`, proton/pion branches) to build the histogram, then a follow-up prompt fits it with a Gaussian-plus-polynomial model. On a single file the peak sits at $\mu \approx 1.1157$ GeV; its significance is limited by the small event count, addressed next.
+The assistant builds the histogram with the uproot server, then fits it. If the model stops after the histogram (smaller models often do), send the fit as a separate request:
+
+```{.ai-prompt}
+Fit the histogram you just built with execute_kernel: a Gaussian plus a 2nd-order polynomial
+over [1.08, 1.16] GeV. Report mu, sigma, the signal yield S, and chi2/ndf, checked against
+the lambda-fit skill's success criteria.
+```
+
+One file gives only ~8 candidates in the fit window, so the correct answer is *insufficient statistics*: the skill says to stop instead of fitting, and a model that quotes $\mu$ anyway has ignored it. The peak at $\mu \approx 1.1157$ GeV comes from the larger sample below.
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
 
-## Smaller models take shortcuts — verify the result, not the route
+## Different tool choices
 
-A capable model uses `execute_kernel` as instructed. A cheaper model may reach for `execute_kernel_dataset` on a single file, or write its own NumPy in the kernel — both produce the same histogram. The audit checklist below judges the *result* (peak position, width, $\chi^2/\text{ndf}$, recorded inputs), not which tool produced it.
+A smaller model may call different tools than the skill specifies and still produce the same histogram. The audit checklist below checks the result, not which tools were used.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
 ## Scaling to the full sample
 
-The same kernel applies unchanged to many files; only the tool differs. `execute_kernel` runs one file; `execute_kernel_dataset` dispatches the identical kernel across a whole file list and returns one merged histogram, so peak memory is independent of dataset size. Enumerate the files with `get_dataset_file_list`, then fan the kernel out:
+The same calculation can run over many files and return one merged histogram:
 
 ```{.ai-prompt}
-Using the lambda-fit skill, run the same proton-pion mass kernel across the dataset's files
-with execute_kernel_dataset (tree 'events'), merge the histograms, then fit the result and
-report mu, sigma, the yield, and chi2/ndf for both Lambda and anti-Lambda, with the plot.
+Using the lambda-fit skill, run the same proton-pion mass kernel across the first 8 files of the
+campaign 26.04.1 BeAGLE eCu ep 10x115 dataset with execute_kernel_dataset (tree 'events'),
+merge the histograms, then fit the result and report mu, sigma, the yield, and chi2/ndf
+for both Lambda and anti-Lambda, with the plot.
 ```
 
-The kernel sandbox is NumPy/awkward only (no imports, no I/O), so the assistant returns the merged histogram and runs a follow-up fit prompt. Over ~100 files this gives the full-statistics spectrum below: a clear Λ⁰ (and Λ̄) peak over the combinatorial background.
+Eight files take about a minute (paste the fit prompt above if it stops). For more files, run background jobs in **batches of ~20 files** and let the assistant wait for them:
 
-![Fitted Λ⁰ and Λ̄ invariant-mass spectra (100-file reference)](fig/lambda_fit.svg){alt='Proton–pion invariant-mass spectrum with Gaussian-plus-polynomial fits showing clear Lambda and anti-Lambda peaks near 1.1157 GeV'}
+```{.ai-prompt}
+Using the lambda-fit skill, run the proton-pion mass kernel over the first 100 files of the
+campaign 26.04.1 BeAGLE eCu ep 10x115 dataset. Submit it with submit_kernel_dataset
+(tree 'events') in batches of about 20 files, poll get_job_status until every job finishes,
+fetch the histograms with get_job_result and merge them, then fit and report mu, sigma,
+the yield, and chi2/ndf for both Lambda and anti-Lambda, with the plot.
+```
+
+With ~100 files the Λ⁰ and Λ̄ peaks are visible above the combinatorial background:
+
+![Fitted Λ⁰ and Λ̄ invariant-mass spectra (reference fit)](fig/lambda_fit.svg){alt='Proton–pion invariant-mass spectrum with Gaussian-plus-polynomial fits showing clear Lambda and anti-Lambda peaks near 1.1157 GeV'}
 
 ```output
 Lambda      -> p pi-:   mu = 1116.30 +/- 0.32 MeV   sigma = 2.72 +/- 0.33 MeV   S = 123   chi2/ndf = 1.16
@@ -157,11 +165,7 @@ $$
 f(m) = A \exp\!\left[ -\tfrac{1}{2} (m - \mu)^2 / \sigma^2 \right] + \left( c_0 + c_1 (m - m_\Lambda) + c_2 (m - m_\Lambda)^2 \right)
 $$
 
-The polynomial absorbs the combinatorial background (Episode 2); the integrated signal is $S = A\sqrt{2\pi}\,\sigma / (\text{bin width})$. Report $S$ with its uncertainty alongside $\mu$, $\sigma$, and $\chi^2/\text{ndf}$ — a bare bin count conflates signal with background.
-
-## Reproducibility and audit
-
-Before treating an automated result as final, confirm it meets the skill's criteria:
+The polynomial describes the combinatorial background (Episode 2); the integrated signal is $S = A\sqrt{2\pi}\,\sigma / (\text{bin width})$. Report $S$ with its uncertainty alongside $\mu$, $\sigma$, and $\chi^2/\text{ndf}$; a bare bin count mixes signal with background.
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
 
@@ -170,24 +174,31 @@ Before treating an automated result as final, confirm it meets the skill's crite
 * **Signal.** $\mu$ within a few MeV of 1.115683 GeV; $\sigma$ consistent with detector resolution; $\chi^2/\text{ndf}$ of order unity; $S$ reported with an uncertainty.
 * **Inputs pinned.** Dataset (campaign and file list), particle masses, mass window, binning, and fit range all fixed and recorded.
 * **Provenance.** Tool calls and their arguments logged, so the run can be reconstructed.
-* **Cost bounded.** File count capped during development before scaling up with `execute_kernel_dataset`.
-* **Oversight.** A human inspected the fit before the result was reported.
+* **Cost limited.** Tested on a few files before scaling up.
+* **Human check.** Someone looked at the fit before the result was reported.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-## Exercises (specification)
+## Exercises
 
 * Run the single-file chain through your assistant and report $\mu$, $\sigma$, $S$, and $\chi^2/\text{ndf}$.
-* Process 10 files with `execute_kernel_dataset` and compare the fitted parameters to the ~100-file result; comment on the change in statistical uncertainty.
+* Process 8 files and compare the fit to the ~100-file result; comment on the statistical uncertainty.
 * Complete the audit checklist for your run, attaching the recorded tool calls as provenance.
 
-You now have the complete workflow: a free assistant, a portable tool server, a versioned skill, and a reproducible Λ⁰ measurement whose every step you can verify. The [final episode](06-eic-mcp-servers.md) catalogues the other MCP servers the EIC provides.
+::::::::::::::::::::::::::::::::::::::::::::: callout
+
+## Try a different beam
+
+The same prompt works with any reconstructed-DIS DID. Nuclear beams (eCu, eAu) give the most Λ per
+event; ep samples need a few times more files.
+
+:::::::::::::::::::::::::::::::::::::::::::::
+
+The [final episode](06-eic-mcp-servers.md) lists the other MCP servers the EIC provides.
 
 ::::::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- The full analysis composes Episodes 2–4: an assistant, the uproot MCP tools, and the lambda-fit skill.
-- The same kernel scales from `execute_kernel` (one root:// file) to `execute_kernel_dataset` (the full sample), merging into one histogram.
-- The yield comes from a Gaussian-plus-polynomial fit; report $\mu$, $\sigma$, $S$, and $\chi^2/\text{ndf}$, not a bare count.
-- Pinning inputs and recording tool calls make the measurement reproducible and auditable.
+- With the lambda-fit skill, the same prompt runs the analysis on one file or on many.
+- Check the fit against the audit checklist before you trust it.
 
 :::::::::::::::::::::::::::::::::::::::::::::

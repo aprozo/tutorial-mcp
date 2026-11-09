@@ -50,56 +50,53 @@ pre.ai-prompt::before, div.sourceCode.ai-prompt::before {
 - How does an agentic assistant differ from a chat model?
 - What are the parts of an LLM "harness"?
 - What loops sit around the agent loop, and what does each add?
-- How do we get trustworthy results from a stochastic model?
-- Why build on an open protocol, not one product?
+- How do we check results from a model whose output varies between runs?
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::: objectives
 
 - Trace one pass of the agent loop for a physics task, naming what enters the context at each step.
-- Draft acceptance criteria precise enough that a grader — human or agent — can apply them.
+- Write acceptance criteria precise enough for a person or another agent to check.
 - Place a given automation (a format-on-edit hook, a nightly report, a prompt tweak) at the right loop level.
 - Choose between a tool, a skill, and a subagent when adding a new capability.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-## The bottleneck is rarely the physics
+## Where the time goes
 
-In a typical analysis the physics is modest: select a final state, build an observable, fit a
-signal. Most effort goes into the software around it — locating datasets, decoding a data model,
-getting branch names and units right, iterating on plotting and fitting code. LLMs compress this
-overhead well, but only if they produce *checkable* results. Later episodes apply this to the decay
+In a typical analysis the physics steps are few: select a final state, build an observable, fit a
+signal. Most of the time goes into the software around them: finding datasets, learning the data
+model, getting branch names and units right, and iterating on plotting and analysis code. LLMs can
+reduce this work, but only if their results can be checked. Later episodes apply this to the decay
 $\Lambda^0 \to p\,\pi^-$.
 
 ## Two modes of use
 
-A **chat completion** is a single forward pass: prompt in, text out, exchange ends. If that text is
-code, *you* execute it, inspect the error, and feed it back by hand. The model never observes your
+A **chat completion** is a single request: a prompt goes in, text comes out. If the text is code,
+you run it, read the error, and paste it back by hand. The model never observes your
 data or the result of running anything.
 
-An **agentic loop** wraps the same model in a control structure that lets it *act*: the model
-proposes an action, an external **tool** carries it out, the result is appended to the context, and
-the model is invoked again — until a stopping condition is met. In the loop the model is conditioned
-on the actual state of your files and real computation output, not on its prior alone.
+An **agentic loop** runs the same model inside a control structure that lets it act. The model
+proposes an action, an external **tool** carries it out, the result is added to the context, and
+the model is called again, until a stopping condition is met. The model then works from the actual
+state of your files and the output of real computations, not only from its training.
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
 
 ## Scope
 
-Here, "generative AI" means an LLM-based coding assistant in this agentic mode — not machine
-learning for reconstruction or particle identification. The object of study is the
-*analysis-authoring* workflow.
+Here, "generative AI" means an LLM-based coding assistant used in this agentic mode. Machine
+learning for reconstruction or particle identification is not covered. The subject is writing and
+running analyses.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-That loop is the first of **four**, each wrapped around the one before it. This episode walks up
-the stack; the rest of the lesson has you build the inner two yourself and shows the outer two
-running at collaboration scale.
+This loop is the innermost of four nested loops, described below.
 
 ## Level 1 — the agent loop
 
-The basic cycle could not be simpler: the model calls a tool, looks at what came back, and decides
+The basic cycle: the model calls a tool, looks at what came back, and decides
 whether it is done.
 
 ```mermaid
@@ -108,7 +105,7 @@ flowchart TD
     accTitle: {Level 1 the agent loop}
     accDescr: {Level 1 the agent loop}
     Q["task"]:::user --> M["model"]:::core
-    M -->|"tool call"| T["tools<br/>read files · run code · query a server"]:::tool
+    M -->|"tool call"| T["tools<br/>read files · run code · query "]:::tool
     T -->|"result appended to context"| D{"task<br/>complete?"}:::core
     D -->|"no"| M
     D -->|"yes"| R["result + provenance"]:::out
@@ -118,32 +115,19 @@ flowchart TD
     classDef user fill:#f1f3f5,stroke:#868e96,stroke-width:1.5px,color:#212529;
 ```
 
-A model plus the machinery that runs this cycle is a **harness**, and it has exactly four parts:
+The model together with the software that runs this cycle is called a **harness**. It has four parts:
 
-* **Model** — reasoning and code generation. *Interchangeable*: provider and model are an
-  implementation choice, not part of the method.
-* **Context** — everything the model attends to in a step: system instructions, files, prior turns,
-  tool outputs. Bounded by the *context window* (in tokens), so what is included, and when, is
-  deliberate.
-* **Tools** — operations the model may invoke, each with a typed interface (name, arguments, return
-  schema). The only channel through which the model affects the outside world.
-* **Control loop** — the policy that alternates *propose → execute → observe* until done. This
-  distinguishes an agent from a chatbot.
+* **Model**: generates text and code. It can be replaced by another model.
+* **Context**: everything the model sees in a step: instructions, files, earlier turns, tool
+  outputs. Its size is limited (the *context window*).
+* **Tools**: operations the model may call. Tools are the only way the model can change anything
+  outside itself.
+* **Control loop**: repeats *propose → execute → observe* until the task is done. This is what
+  separates an agent from a chatbot.
 
-::::::::::::::::::::::::::::::::::::::::::::: callout
+### Extending the harness
 
-## Why the loop is essential, not cosmetic
-
-Feeding tool results back lets the assistant correct course against ground truth: read the actual
-branch names rather than guessing, run a fit and read back its $\chi^2/\mathrm{ndf}$, refit if the peak is
-misplaced. A single completion cannot, because it never observes a consequence of its actions.
-
-:::::::::::::::::::::::::::::::::::::::::::::
-
-### Extending the harness: the modern toolkit
-
-Production assistants keep that small core and surround it with standard extension points. The
-vocabulary recurs in every modern assistant's documentation.
+Most assistants also support the following extensions.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'fontSize':'15px','lineColor':'#94a3b8','edgeLabelBackground':'#e2e8f0','clusterBkg':'#1f293720','clusterBorder':'#94a3b8','titleColor':'#94a3b8'}}}%%
@@ -151,7 +135,8 @@ flowchart TB
     accTitle: {AI agent harness}
     accDescr: {AI agent harness}
     MCP["MCP servers<br/>external tools & data"]:::tool --> H
-    SUB["subagents<br/>specialised, isolated context"]:::tool --> H
+    SK["skills<br/>procedures loaded on demand"]:::tool --> H
+    SUB["subagents<br/>specialized, isolated context"]:::tool --> H
     HOOKS["hooks<br/>lifecycle automation"]:::tool --> H
     MON["monitors<br/>watch & react"]:::tool --> H
     H(["harness core<br/>model + context + tools + loop"]):::core
@@ -159,37 +144,22 @@ flowchart TB
     classDef tool fill:#e6f7ed,stroke:#2f9e44,stroke-width:1.5px,color:#0b3d1f;
 ```
 
-* **MCP servers** — the *tools* layer, standardised. A server exposes tools, data, and prompts over
-  the Model Context Protocol so one implementation works in any client. This is how we give the
-  assistant physics capabilities ([Episode 3](03-mcp-servers.md)).
-* **Subagents (agents)** — a separate assistant instance with its own context window, tools, and
-  instructions, spawned for a sub-task. They isolate context and enable divide-and-conquer.
-* **Skills** — packaged, versioned *procedures* (a `SKILL.md` plus scripts) loaded on demand when a
-  request matches ([Episode 4](04-skills.md)). A tool is a capability; a skill is a recipe.
-
-| Component | What it adds to the core loop | In this tutorial |
-| --- | --- | --- |
-| MCP servers | external tools & data, client-agnostic | Episodes 3 & 5 (the [uproot](https://github.com/eic/uproot-mcp-server)/[xrootd](https://github.com/eic/xrootd-mcp-server) servers) |
-| Subagents | isolated, specialised helpers | discussed in Episode 5 |
-| Skills | reusable, versioned procedures | Episode 4 (`SKILL.md`) |
-
-Two smaller helpers matter for the loops later in this episode:
-
-* **Hooks** — small scripts the harness runs automatically at fixed moments (before or after a tool
-  call, at session end). Simple examples: re-format code after every edit; refuse any command that
-  would delete data; append each tool call to a provenance log.
-* **Monitors** — watchers for work that outlives a single turn: they follow background state and
-  re-invoke the assistant when it changes. Simple examples: watch a long fit or batch job and wake
-  the assistant with the result when it finishes; watch a directory and react when a new file
-  appears.
+* **MCP servers**: tools in a standard form that works with any assistant. This is how the
+  assistant gets physics tools ([Episode 3](03-mcp-servers.md)).
+* **Subagents**: separate assistants started for a sub-task, so a large task can be split up.
+* **Skills**: versioned *procedures* (a `SKILL.md` plus scripts) loaded when a request matches
+  ([Episode 4](04-skills.md)).
+* **Hooks**: scripts the harness runs at fixed moments, e.g. reformat code after every edit or log
+  each tool call.
+* **Monitors**: watch background work, e.g. a long batch job, and call the assistant again when it
+  finishes.
 
 ## Level 2 — the verification loop
 
-A level-1 agent stops when *it* thinks the task is complete — and an LLM is stochastic: identical
-prompts can yield different outputs, and a confident answer is not evidence of a correct one. The
-fix is a second loop around the first: a **grader** checks the agent's result against explicit
-acceptance criteria before it is accepted, and a failure goes back in as feedback for another
-attempt.
+A level-1 agent stops when it decides the task is complete. An LLM is stochastic: the same prompt
+can give different outputs, and a confident answer is not evidence of a correct one. A second loop
+around the first handles this. A **grader** checks the agent's result against explicit acceptance
+criteria, and a failure goes back to the agent as feedback for another attempt.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'fontSize':'15px','lineColor':'#94a3b8','edgeLabelBackground':'#e2e8f0','clusterBkg':'#1f293720','clusterBorder':'#94a3b8','titleColor':'#94a3b8'}}}%%
@@ -205,25 +175,20 @@ flowchart TD
     classDef out fill:#f3e8ff,stroke:#7048e8,stroke-width:1.5px,color:#2e1065;
 ```
 
-The discipline behind it: treat every model output as a **hypothesis**, accepted only after
-checking it against something external — the data, a fit statistic, a known physical value, or an
-independent implementation. For the $\Lambda^0$ measurement the criteria are physical and
+Treat every model output as a **hypothesis** and accept it only after checking it against something
+external: the data, a fit statistic, a known physical value, or an independent implementation. For the $\Lambda^0$ measurement the criteria are physical and
 checkable: $|\mu - 1.115683\,\mathrm{GeV}| < 5\,\mathrm{MeV}$, $\sigma$ consistent with detector
-resolution, $\chi^2/\mathrm{ndf}$ of order 1. In [Episode 4](04-skills.md) you will write exactly
-this grader into the lambda-fit skill's **success criteria** — and a passing agent reports the
-numbers, while a failing one must report the failure, not a result.
+resolution, $\chi^2/\mathrm{ndf}$ of order 1. In [Episode 4](04-skills.md) you write this grader into the
+lambda-fit skill's **success criteria**. An agent that passes reports the numbers; one that fails
+must report the failure instead of a result.
 
-Grading costs time and tokens. It is the right trade wherever correctness matters more than speed —
-in physics, almost always. So favour tools that return compact, inspectable quantities — counts,
-edges, fit parameters — and keep a record of what was run: reproducibility and provenance are the
-criteria by which an automated result earns trust. At collaboration scale the grader can be
-mechanical, like the secret-token fabrication check in [Episode 6](06-eic-mcp-servers.md).
+Grading costs time and tokens. Prefer tools that return small quantities you can inspect (counts, bin edges, fit parameters), and keep a
+record of what was run.
 
 ## Level 3 — the operation loop
 
-With verification in place, the agent no longer needs you to press enter. A third loop makes it a
-*component*: an event — a schedule, a finished production job, a new pull request — triggers the
-agent, its verified output updates something (a report, a documentation page, an alert), and the
+Once results are checked automatically, the agent can also be started without you. In a third loop an event
+(a schedule, a finished production job, a new pull request) starts the agent, its verified output updates something (a report, a documentation page, an alert), and the
 system goes back to waiting.
 
 ```mermaid
@@ -239,87 +204,32 @@ flowchart LR
     classDef pkg fill:#fff4e0,stroke:#f08c00,stroke-width:1.5px,color:#5c3b00;
 ```
 
-Hooks and monitors (above) are the entry-level version of this. The collaboration-scale version is
-in [Episode 6](06-eic-mcp-servers.md): documentation regenerated on schedule against the current
-code base, and pull-request reviews triggered per PR.
+[Episode 6](06-eic-mcp-servers.md) shows collaboration examples: documentation regenerated on a
+schedule, and reviews triggered per pull request.
 
-## Level 4 — the improvement loop, in a word
+## Level 4 — the improvement loop
 
-There is one more loop, around everything: periodically look at what the agent *actually did* —
-transcripts, failed fits, wrong tool choices — and feed that back into the **harness itself**:
-sharpen `AGENTS.md`, tighten a skill's success criteria, add the missing tool. Levels 1–3 make the
-agent do the work; level 4 makes the agent *better at* the work, which is where the gains compound.
-You will practise a small version of it every time a prompt in this lesson goes wrong and you fix
-the instructions instead of retyping the request.
+In the outer loop you periodically review what the agent did (transcripts, failed fits, wrong tool
+choices) and change the **harness**: clarify
+`AGENTS.md`, tighten a skill's success criteria, add a missing tool. You do a small version of this
+whenever a prompt goes wrong and you fix the instructions instead of retyping the request.
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
 
-## Where a human belongs in each loop
+## Human checkpoints
 
-Autonomy does not mean absence of judgement — each level has a natural checkpoint: approving a
-sensitive tool call (①), signing off a graded result (②), reviewing what runs unattended (③),
-and deciding which harness changes to keep (④). Put yourself at the checkpoints, not in the
-middle of the loop.
-
-:::::::::::::::::::::::::::::::::::::::::::::
-
-::::::::::::::::::::::::::::::::::::::::::::: challenge
-
-## Discussion: what does the loop buy you?
-
-For the $\Lambda^0 \to p\,\pi^-$ analysis, identify two failure modes of a one-shot completion that an
-agentic loop removes.
-
-::::::::::::::: solution
-
-1. **Hallucinated schema.** A one-shot model may emit a plausible but wrong branch name (for
-   example `ReconstructedParticles.px` instead of `ReconstructedChargedParticles.momentum.x`). An
-   agent can query the file and use the real names.
-2. **Unvalidated fit.** A one-shot model cannot know whether its fit converged or where the peak
-   landed. An agent can execute the fit, read $\mu$, $\sigma$, and $\chi^2/\mathrm{ndf}$, and iterate.
-
-Both are the same principle: conditioning on observations beats conditioning on the prior. The
-first is fixed at level 1 (observe, don't guess), the second at level 2 (grade, don't trust).
-
-:::::::::::::::
+Each level has a point where a person should decide: approving a sensitive tool call (1), signing
+off a graded result (2), reviewing what runs unattended (3), and choosing which harness changes to
+keep (4).
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-## Where this sits
-
-Generative AI is already part of the research software ecosystem — code development and review,
-navigating large codebases, searching technical documentation. The ePIC collaboration, which
-produced the data used here, applies these tools in several such roles. This lesson is a
-self-contained, low-cost entry point: with a free assistant and a single tool server you will carry
-out a complete measurement on real ePIC data.
-
-## Portability through an open protocol
-
-The assistant market changes on a timescale of months, so we depend on a standard rather than a
-product.
-
-::::::::::::::::::::::::::::::::::::::::::::: callout
-
-## One interface, many assistants
-
-The **Model Context Protocol (MCP)** is an open standard for exposing tools to language-model
-clients. A tool implemented once against MCP works in any compliant assistant — like a hardware bus
-that decouples peripherals from hosts. In [Episode 3](03-mcp-servers.md) you connect the EIC tool
-servers and see that any MCP-compliant client connects the same way, making the workflow
-reproducible across environments.
-
-:::::::::::::::::::::::::::::::::::::::::::::
-
-The [next episode](02-your-ai-coding-setup.md) states the physics measurement; you install an
-assistant on the [Setup](../learners/setup.md) page.
+The [next episode](02-your-ai-coding-setup.md) describes the physics measurement.
 
 ::::::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- A conversational model returns text; an agentic harness executes tools and conditions on their output.
-- Level 1, the agent loop, runs in a harness with four parts: the model, the context window, a set of typed tools, and a control loop — extended by MCP tools, subagents, skills, hooks, and monitors.
-- Level 2 wraps the agent in a verification loop: a grader checks each result against explicit success criteria, because stochastic output must be treated as a hypothesis, not an answer.
-- Level 3 runs the verified agent on events and schedules; level 4 feeds what actually happened back into the harness, where gains compound.
-- Building on the open Model Context Protocol keeps tools portable across assistants and supports reproducibility.
+- An agentic assistant runs tools and reads their output; a chat model only returns text.
+- Treat every result as a hypothesis and check it against clear criteria before you accept it.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 

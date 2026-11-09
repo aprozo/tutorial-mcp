@@ -2,111 +2,92 @@
 title: Setup
 ---
 
-Everything runs inside **eic-shell**. Install an AI assistant (your choice), get `eic-mcp`, and
-one command starts the tool servers. Nothing else — no grid certificate, no data download — the
-MCP servers reuse the container's own `uproot`, `xrdfs`, and `rucio` (already logged in to the
-shared read-only `eicread` account).
+eic-shell contains everything this lesson needs: the three MCP servers (uproot, xrootd, rucio),
+the `eic-mcp` command that starts them, and the `opencode` assistant. You need no grid certificate
+and download no data: `rucio` is already signed in to the shared read-only `eicread` account.
 
 ::::::::::::::::::::::::::::::::::::::::::::: checklist
 
 ## Quick checklist
 
-* [ ] **eic-shell** working (`./eic-shell` drops you into the container).
-* [ ] One **AI assistant** installed and connected to a free model.
-* [ ] **`eic-mcp`** on your `PATH` (one `git clone`).
-* [ ] **`eic-mcp up`** starts the three MCP servers (the first run bootstraps them automatically).
+* [ ] **eic-shell** is up to date (`./eic-shell --upgrade`).
+* [ ] Inside eic-shell, **`eic-mcp up`** starts three servers and **`opencode`** opens.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
 ## 1. eic-shell
 
-You already use it every day, so just make sure `./eic-shell` drops you into the container —
-everything below runs **inside** it. (New to ePIC? Start with the
-[environment setup guide](https://eic.github.io/tutorial-setting-up-environment/).)
-
-## 2. Choose an AI assistant
-
-![](fig/one-ring.svg){alt='gold ring engraved with the words EIC collider' width='160px'}
-
-**One assistant to rule them all?** Fortunately not: any **agentic** assistant — one that can
-read/write your files and run commands, not just emit text — works, and MCP keeps you free to
-switch. Terms and free tiers change quickly, so verify before relying on them.
-
-| Tool | Interface | Free access |
-| --- | --- | --- |
-| [opencode](https://opencode.ai) | terminal | open source (MIT); free hosted models (no key), bring your own key, or a local model |
-| [GitHub Copilot](https://github.com/features/copilot) | [VS Code](https://code.visualstudio.com/), CLI | free tier; free Pro for verified students/educators/OSS maintainers |
-| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | terminal | open source; generous free tier with a personal Google account |
-| [Codex](https://developers.openai.com/codex) | terminal, IDE | included with ChatGPT plans |
-| [Claude Code](https://claude.com/claude-code) | terminal, IDE | included with Claude plans |
-| [Cursor](https://cursor.com/) | dedicated editor | free tier |
-| [Cline](https://cline.bot/) / [Continue](https://continue.dev/) | VS Code extensions | open source; bring your own key |
-
-::::::::::::::::::::::::::::::::::::::::::::: callout
-
-## Two senses of "free"
-
-**Open-source clients** ([opencode](https://opencode.ai), [Cline](https://cline.bot/),
-[Continue](https://continue.dev/)) install free but bill per token — zero marginal cost only with a
-local model (e.g. via [Ollama](https://ollama.com)). **Commercial free tiers**
-([Copilot](https://github.com/features/copilot) Free, [Cursor](https://cursor.com/)) bundle a quota,
-then meter. If an assistant only emits code to run by hand, enable its **agent**/**edit** mode.
-
-:::::::::::::::::::::::::::::::::::::::::::::
-
-## 3. Install one
-
-This lesson uses **[opencode](https://opencode.ai)** — terminal, native MCP, free models:
+See the [environment setup guide](https://eic.github.io/tutorial-setting-up-environment/) if you
+do not have eic-shell yet. Then, in the folder with `./eic-shell`:
 
 ```bash
-curl -fsSL https://opencode.ai/install | bash
+cd ~/eic                  # yours may differ
+./eic-shell --upgrade
 ```
 
-The free hosted models work out of the box — no key, no login.
+## 2. Start the servers and the assistant
 
-Prefer an editor? Install [VS Code](https://code.visualstudio.com/) plus the
-[GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot) and
-[Copilot Chat](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat) extensions
-(sign in with GitHub — students/educators get Pro free — and use **Agent** mode), or
-[Cursor](https://cursor.com/).
+```bash
+./eic-shell
+mkdir -p lambda && cd lambda     # a working directory for the analysis
+eic-mcp up                       # uproot, xrootd, rucio on 127.0.0.1:9101-9103
+eic-mcp config opencode          # writes opencode.jsonc here
+opencode
+```
+
+In opencode, `/mcp` should list `uproot`, `xrootd`, and `rucio` as connected. The free hosted
+models need no login. If `eic-mcp` or `opencode` is not found, exit eic-shell, return to the folder
+containing the launcher, run `./eic-shell --upgrade`, and start eic-shell again.
+
+On macOS, eic-shell is a Docker container: the servers stop when you leave it, and its home
+(`/root`) is wiped, so opencode forgets its settings. Keep your work in the eic-shell folder.
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
 
 ## Check it works
 
-Open an empty folder in your assistant and ask: *"Create hello.py that prints the PDG Λ⁰ baryon mass
-in GeV, then run it."* It should **write** the file and **run** it, printing `1.115683`. If it only
-shows code, switch on agent/edit mode — executing, not suggesting, is what this lesson relies on.
+In an empty directory, ask: *"Create hello.py that prints the PDG Λ⁰ baryon mass in GeV, then run
+it."* The assistant should write the file and run it, printing `1.115683`. If it only shows the
+code, switch it to agent (build) mode.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-## 4. Start the MCP servers — `eic-mcp up`
+## Other assistants
 
-The launcher lives in its own repository; clone it once and put it on your `PATH`:
+![](fig/one-ring.svg){alt='gold ring engraved with the words EIC' width='160px'}
 
-```bash
-git clone https://github.com/eic/eic-mcp
-export PATH=$PWD/eic-mcp/bin:$PATH    # add this line to your shell profile
-```
+**One assistant to rule them all?** Any **agentic** assistant — one that can
+read/write your files and run commands, not just emit text — works, and MCP works with any.
 
-It runs the three servers (uproot, xrootd, rucio) inside eic-shell:
+| Tool | Interface | Free access |
+| --- | --- | --- |
+| [opencode](https://opencode.ai) | terminal | open source (MIT); free hosted models (no key), bring your own key, or a local model |
+| [GitHub Copilot](https://github.com/features/copilot) | [VS Code](https://code.visualstudio.com/), CLI | free tier; free Pro for verified students/educators/OSS maintainers |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | terminal | open source; free tier with a personal Google account |
+| [Codex](https://developers.openai.com/codex) | terminal, IDE | included with ChatGPT plans |
+| [Claude Code](https://claude.com/claude-code) | terminal, IDE | included with Claude plans |
+| [Cursor](https://cursor.com/) | dedicated editor | free tier |
+| [Cline](https://cline.bot/) / [Continue](https://continue.dev/) | VS Code extensions | open source; bring your own key |
 
-```bash
-eic-mcp up
-```
-
-If your eic_xl image already ships the servers, they just start; otherwise the **first** run
-bootstraps them automatically (a one-time clone and build, a few minutes). Every later `eic-mcp up`
-starts in seconds. You start and stop the servers per session in
-[Episode 3](../episodes/03-mcp-servers.md) with `eic-mcp up` / `eic-mcp down`; point your assistant
-at them with `eic-mcp config opencode` (see Episode 3).
+eic-shell also has `claude` and `copilot`: run `eic-mcp config claude` (or `copilot`), then start
+it. The first login prints a code to paste in a browser, so it works over SSH.
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
 
-## No credentials, no data download
+## Assistant outside eic-shell
 
-The `rucio` server signs in automatically with the shared, read-only `eicread` account baked into
-eic-shell — the same one the `rucio` command line uses. You never enter a password or a grid proxy,
-and you never download a dataset: the assistant reads ROOT files in place over `root://`.
+The servers must run in eic-shell, but the client can run on your machine. Keep `eic-mcp up`
+running and put the client config in the directory where you start the client.
+
+* **Linux, WSL:** apptainer shares the host network. Run `eic-mcp config <client>` there.
+* **macOS:** publish the ports once, restart `./eic-shell`, and download the example config
+  (`eic-mcp` does not run on the Mac itself):
+
+  ```bash
+  cd ~/eic
+  grep -q 9101 eic-shell || sed -i '' 's|^docker run |docker run -p 127.0.0.1:9101-9103:9101-9103 |' eic-shell
+  cd lambda                   # or the directory where you will launch opencode
+  curl -fsSLO https://raw.githubusercontent.com/eic/tutorial-mcp/main/files/mcp-config/opencode.jsonc
+  ```
 
 :::::::::::::::::::::::::::::::::::::::::::::

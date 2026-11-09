@@ -48,227 +48,142 @@ pre.ai-prompt::before, div.sourceCode.ai-prompt::before {
 ::::::::::::::::::::::::::::::::::::::::::::: questions
 
 - What is MCP, and what problem does it solve?
-- What does the uproot server expose, and how is it sandboxed?
-- How do you connect and drive a server?
+- What can the EIC tool servers do?
+- How do you connect an assistant to them?
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::: objectives
 
-- Bring the servers up, check them, and read a log when one misbehaves (`eic-mcp up`/`status`/`logs`).
+- Start the servers, check them, and read a server log when something fails (`eic-mcp up`/`status`/`logs`).
 - Generate the connection file for your own client with `eic-mcp config`.
 - Discover a real DIS dataset by prompting, without hard-coding names or paths.
 - Judge which returned quantities are worth verifying, and against what.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-## The interoperability problem
+## One interface for tools
 
-Tools are the only channel through which an assistant acts
-([Episode 1](01-why-genai-for-physics.md)). The
-**Model Context Protocol (MCP)** standardises the interface: implement a tool once as a **server**,
-and any MCP-compliant **client** (the assistant) can use it.
+Tools are the only way an assistant can act ([Episode 1](01-why-genai-for-physics.md)). The
+**Model Context Protocol (MCP)** defines a standard interface for them: write a tool once as a
+**server**, and any **client** (assistant) that supports MCP can use it.
 
-MCP is a client–server protocol over **JSON-RPC 2.0**. After capability negotiation, the server
-advertises three object types — **tools** (callable functions), **resources** (readable data), and
-**prompts** (templated instructions). Two transports exist: **stdio** (client launches the server as
-a subprocess, messages over standard input/output) and **streamable HTTP** for networked servers.
-The lesson's servers run inside eic-shell and speak streamable HTTP on `127.0.0.1`.
+The lesson's servers run inside eic-shell, and the assistant talks to them over a local web
+address.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'fontSize':'15px','lineColor':'#94a3b8','edgeLabelBackground':'#e2e8f0','clusterBkg':'#1f293720','clusterBorder':'#94a3b8','titleColor':'#94a3b8'}}}%%
 flowchart LR
     accTitle: {EIC MCP data tools}
     accDescr: {EIC MCP data tools}
-    A["AI assistant<br/>opencode · Copilot · Cursor"]:::core <-->|"JSON-RPC / HTTP"| S["uproot tool server<br/>(MCP, in eic-shell)"]:::tool
+    A["AI assistant<br/>opencode · Copilot · Cursor"]:::core <-->|"MCP"| S["uproot tool server<br/>(MCP, in eic-shell)"]:::tool
     S <-->|"uproot"| F["EDM4eic ROOT file"]:::data
     classDef core fill:#e7efff,stroke:#4c6ef5,stroke-width:1.5px,color:#10204a;
     classDef tool fill:#e6f7ed,stroke:#2f9e44,stroke-width:1.5px,color:#0b3d1f;
     classDef data fill:#fff4e0,stroke:#f08c00,stroke-width:1.5px,color:#5c3b00;
 ```
 
-::::::::::::::::::::::::::::::::::::::::::::: callout
-
-## Why run the servers inside eic-shell
-
-The servers reuse the container's own `uproot`, `xrdfs`, and `rucio`, so dependencies are pinned and
-one environment runs both analysis and tools. `eic-mcp up` starts them as background HTTP services;
-`eic-mcp down` stops them. They hold no state between sessions.
-
-:::::::::::::::::::::::::::::::::::::::::::::
-
 ## The uproot tool server
 
 The ePIC [uproot tool server](https://github.com/eic/uproot-mcp-server) reads ROOT/EDM4eic files
-with [uproot](../learners/reference.md) and returns **compact, JSON-serialisable summaries** — edges,
-counts, statistics, fit inputs — not raw arrays, keeping payloads inside the model's context budget.
-It exposes 15 tools in four groups:
-
-| Group | Representative tools | Purpose |
-| --- | --- | --- |
-| Inspection | `get_file_structure`, `get_tree_info`, `get_branch_statistics`, `validate_dataset_schema` | enumerate trees, branches, types, and summary statistics |
-| Single-file compute | `histogram_branch`, `execute_kernel` | histogram a branch; run sandboxed NumPy/awkward over branches |
-| Dataset (multi-file) | `get_dataset_file_list`, `histogram_dataset`, `get_dataset_statistics`, `execute_kernel_dataset`, `estimate_dataset_cost` | enumerate matching files, then accumulate operations across them |
-| Asynchronous jobs | `submit_kernel_dataset`, `get_job_status`, `get_job_result`, `cancel_job` | dispatch long dataset jobs and poll them |
-
-::::::::::::::::::::::::::::::::::::::::::::: callout
-
-## The execution sandbox
-
-`execute_kernel` runs client-supplied Python in a restricted environment: no `import`, no file or
-network I/O, only `np` (NumPy) and `ak` (awkward) in scope. Limits are enforced at compile time, and
-the code runs in a subprocess with a 30-second wall-clock limit.
-
-:::::::::::::::::::::::::::::::::::::::::::::
+with [uproot](../learners/reference.md). It can list a file's contents, compute statistics and
+histograms, and run short NumPy calculations over one file or a whole dataset. It returns small
+summaries (counts, bin edges, statistics) that you can check, not raw data. The calculations run
+in a sandbox that cannot install software or write files.
 
 ## Start the servers
 
-Start the servers for this session from inside eic-shell (the first `eic-mcp up` ever run
-bootstraps them automatically if your image doesn't ship them yet — see
-[Setup](../learners/setup.md)):
+Start the servers inside eic-shell (see [Setup](../learners/setup.md)):
 
 ```bash
 $ eic-mcp up
 ```
 
-This launches the uproot, xrootd, and rucio servers as MCP-over-HTTP endpoints on `127.0.0.1`,
-ports `9101`, `9102`, `9103`. Stop them with `eic-mcp down`. The assistant connects to those URLs.
+This starts the uproot, xrootd, and rucio servers. `eic-mcp status` shows which are running, and
+`eic-mcp logs uproot` shows a server's log.
+
+::::::::::::::: callout
+
+## If rucio answers but xrootd/uproot time out
+
+If dataset queries work but file access hangs, the XRootD store may be down; check with
+`xrdfs root://epicxrd1.sdcc.bnl.gov:1095 ls /eic/EPIC/RECO`.
+
+The default store (BNL) has campaigns from 25.12.0. For older ones (up to 25.10.x) use JLab:
+`XROOTD_SERVER=root://dtn2304.jlab.org:8443 XROOTD_BASE_DIR=/jlab-osdf-ro/eic/EPIC/volatile eic-mcp restart`.
+
+If every uproot call times out after one large call, the server is busy, not broken: it handles
+one request at a time. Wait, or run `EIC_MCP_SERVERS=uproot eic-mcp restart`.
+
+:::::::::::::::
 
 ## Connect the assistant
 
-opencode reads its server list from a JSON config. Generate it in the directory where you launch
-opencode (or write it to `~/.config/opencode/opencode.jsonc`):
+Write opencode's config file in the directory where you start opencode, then start it:
 
 ```bash
-$ eic-mcp config opencode > opencode.jsonc
+$ eic-mcp config opencode
+$ opencode
 ```
 
-which prints the three server URLs
-(committed as the example [`files/mcp-config/opencode.jsonc`](https://github.com/eic/tutorial-mcp/blob/main/files/mcp-config/opencode.jsonc)):
+In the session, `/mcp` lists the connected servers and their tools.
 
-```json
-{
-  "mcp": {
-    "uproot": { "type": "remote", "url": "http://127.0.0.1:9101/mcp", "enabled": true },
-    "xrootd": { "type": "remote", "url": "http://127.0.0.1:9102/mcp", "enabled": true },
-    "rucio":  { "type": "remote", "url": "http://127.0.0.1:9103/mcp", "enabled": true }
-  }
-}
-```
-
-Within a session, `/mcp` lists the connected servers and their tools.
-
-::::::::::::::: callout
-
-## Other clients point at the same URLs
-
-The HTTP endpoints work with any MCP client, and `eic-mcp config` writes the matching file:
-
-```bash
-$ eic-mcp config copilot > .vscode/mcp.json      # VS Code / Copilot
-$ eic-mcp config cursor  > .cursor/mcp.json      # Cursor
-$ eic-mcp config claude  > .mcp.json             # Claude Code
-$ eic-mcp config gemini  > .gemini/settings.json # Gemini CLI
-$ eic-mcp config codex  >> ~/.codex/config.toml  # Codex (TOML, appended)
-```
-
-:::::::::::::::
-
-::::::::::::::: callout
-
-## Running the client outside the container
-
-The MCP servers always run *inside* eic-shell, but your AI client doesn't have to.
-
-* **Linux and Windows/WSL:** eic-shell uses Apptainer/Singularity, which shares the host network.
-  The `http://127.0.0.1:910x/mcp` URLs work identically from inside the container and from the
-  host — install your client on the host, run `eic-mcp config <client>` (the launcher finds your
-  eic_xl image automatically), and connect.
-* **macOS:** your `./eic-shell` script runs Docker under the hood, and it publishes no ports, so
-  the endpoints are *not* reachable from the host by default. Simplest fix: run the client inside
-  eic-shell (opencode is a terminal program and installs fine in the container). Otherwise, either
-  open the `eic-shell` script the installer generated and add
-  `-p 127.0.0.1:9101-9104:9101-9104` to its `docker run` line, or start the container with the
-  full command yourself (this is what `./eic-shell` runs, plus the port flag):
-
-  ```bash
-  docker run --platform linux/amd64 -p 127.0.0.1:9101-9104:9101-9104 \
-    -v /Users:/Users -v /Volumes:/Volumes -v /tmp:/tmp -w=$PWD -it --rm \
-    -e EIC_SHELL_PREFIX=$PWD/local eicweb/eic_xl:nightly eic-shell
-  ```
-
-:::::::::::::::
+Other clients use the same URLs: `eic-mcp config claude` (or `copilot`, `vscode`, `cursor`,
+`gemini`, `codex`) writes the file where that client reads it.
 
 ## Finding the data with MCP
 
-You fetch no dataset by hand. The other two MCP servers let the assistant locate and verify the real
-files, replacing the manual `rucio` + `xrdfs` recipe; `uproot-mcp` reads the file straight from the
-store, with no download step.
+You do not download a dataset. The other two MCP servers let the assistant find and verify the
+files, in place of running `rucio` and `xrdfs` by hand, and `uproot-mcp` then reads them directly
+from the store.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'fontSize':'15px','lineColor':'#94a3b8','edgeLabelBackground':'#e2e8f0','clusterBkg':'#1f293720','clusterBorder':'#94a3b8','titleColor':'#94a3b8'}}}%%
 flowchart LR
     accTitle: {EIC MCP data tools}
     accDescr: {EIC MCP data tools}
-    R["rucio-mcp<br/>list_dids · list_files · list_file_replicas"]:::tool -->|"DID + root:// replica URLs"| X["xrootd-mcp<br/>list_datasets · check_file_exists · get_dataset_event_statistics"]:::tool
-    X -->|"verified root:// paths"| U["uproot-mcp<br/>analyse in place"]:::core
+    R["rucio-mcp<br/>find the dataset"]:::tool -->|"file locations"| X["xrootd-mcp<br/>check the files"]:::tool
+    X -->|"checked files"| U["uproot-mcp<br/>analyze in place"]:::core
     classDef tool fill:#e6f7ed,stroke:#2f9e44,stroke-width:1.5px,color:#0b3d1f;
     classDef core fill:#e7efff,stroke:#4c6ef5,stroke-width:1.5px,color:#10204a;
 ```
 
-* **[`rucio-mcp`](https://github.com/eic/rucio-eic-mcp-server)** queries the data-management catalogue:
-  `list_dids` finds the dataset identifier (DID) by name, `get_did_metadata` and `list_files`
-  describe its contents, `list_file_replicas` returns the physical `root://` locations.
-* **[`xrootd-mcp`](https://github.com/eic/xrootd-mcp-server)** works directly on the store: `list_campaigns` / `list_datasets` browse it,
-  `list_directory` and `check_file_exists` enumerate and verify files, and
-  `get_dataset_event_statistics` reports total events across a dataset.
+* **[`rucio-mcp`](https://github.com/eic/rucio-eic-mcp-server)** searches the data catalog: it
+  finds a dataset by name, lists its files, and gives their `root://` locations.
+* **[`xrootd-mcp`](https://github.com/eic/xrootd-mcp-server)** browses the data store and checks
+  that the files exist.
 
-rucio tells you *what* the dataset is and *where* its replicas live, xrootd confirms the files are
-there, and `uproot-mcp` reads a `root://` URL **in place**.
-
-::::::::::::::::::::::::::::::::::::::::::::: callout
-
-## rucio works automatically — no key
-
-Inside eic-shell, `rucio-mcp` signs in to the authenticated catalogue with the shared, read-only
-`eicread` account. No password or grid proxy. The xrootd path is public, so to only *browse* the
-store you can use `xrootd-mcp` alone.
-
-:::::::::::::::::::::::::::::::::::::::::::::
+`uproot-mcp` then reads a `root://` file **in place**.
 
 ## List the available campaigns
 
-ePIC data is organised by **production campaign** — a version such as `25.12.0` — together with the
-beam/target and physics, all encoded in the rucio DID
-(e.g. `epic:/RECO/25.12.0/epic_craterlake/DIS/CC/18x275/...`). Before locating a specific dataset,
-see which campaigns exist so you target a current one:
+ePIC data is organized by **production campaign**, a version such as `26.06.0`. The campaign, the
+beam/target, and the physics process are all part of the rucio DID
+(e.g. `epic:/RECO/26.06.0/epic_craterlake/DIS/pythia8.316-1.0/NC/noRad/ep/18x275/...`). Before
+locating a specific dataset, check which campaigns exist so you use a current one:
 
 ```{.ai-prompt}
-Using the rucio tools, list the DIDs in the epic scope and summarise which production campaigns are available (the version field, e.g. 25.12.0). Show the most recent few and roughly how many datasets each holds.
+Using the rucio tools, find which production campaigns are available (the version field in the DIDs, e.g. 26.06.0) and show the most recent few.
 ```
 
-The assistant calls [`list_dids`](https://github.com/eic/rucio-eic-mcp-server) on scope `epic`,
-groups the DIDs by their campaign component, and reports the campaigns — so you pick a version that
-still exists instead of guessing one that has moved on. (The `xrootd` server's `list_campaigns`
-browses the same structure on the store directly.)
+Watch how the assistant does this: the catalog holds thousands of datasets in no particular
+order, so looking at only the first page of results can miss the newest campaigns.
 
 ::::::::::::::::::::::::::::::::::::::::::::: challenge
 
 ## Exercise: locate a dataset (≈ 10 min)
 
-With `rucio` and `xrootd` connected (no credentials — see the callout), ask your assistant:
+Ask your assistant:
 
 ```{.ai-prompt}
-Use the rucio tools to find the ePIC reconstructed-DIS dataset for the BeAGLE eCu 10x115 GeV sample in campaign 25.10.2, list its files, then use the xrootd tools to confirm those files exist on the store and report the total number of events.
+Use the rucio tools to find the ePIC reconstructed-DIS dataset for the BeAGLE eCu ep 10x115 GeV sample in campaign 26.04.1, list its files, then use the xrootd tools to confirm those files exist on the store and report the total number of events.
 ```
 
 ::::::::::::::: solution
 
-The assistant calls `list_scopes`/`list_dids` (scope `epic`, narrowing by a name glob on the
-campaign and beam/target) to find the DID, `list_files` to enumerate it, and `list_file_replicas`
-for the `root://` URLs. It then switches to `xrootd-mcp` (`list_datasets`, `check_file_exists`,
-`get_dataset_event_statistics`) to verify the files and total the events. The DID is *discovered*
-with `list_dids`, not hard-coded — what you want when campaign names change.
+The assistant finds the dataset with rucio (374 files), gets their `root://` locations, and checks
+them with xrootd. rucio does not store event counts, and reading all 374 files would take an hour,
+so a good answer checks a few files (≈ 1,220 events each) and extrapolates.
 
 :::::::::::::::
 
@@ -276,27 +191,26 @@ with `list_dids`, not hard-coded — what you want when campaign names change.
 
 ## Inspect the dataset
 
-You specify the operation in natural language and the assistant issues the matching tool calls. Take
-one of the `root://` URLs from the previous exercise — written below as `root://dtn-eic.jlab.org//…`
-— and analyse it **in place**.
+You describe what you want in plain language and the assistant makes the tool calls. Take one of
+the `root://` URLs from the previous exercise (written below as
+`root://epicxrd1.sdcc.bnl.gov:1095//…`) and analyze it in place.
 
 ::::::::::::::::::::::::::::::::::::::::::::: challenge
 
 ## Exercise: enumerate the schema (≈ 10 min)
 
-Issue the request:
+Ask:
 
 ```{.ai-prompt}
-Using the uproot tools, report the structure of root://dtn-eic.jlab.org//<your-discovered-file>.root and list the members of the ReconstructedChargedParticles collection.
+Using the uproot tools, report the structure of the events tree in root://epicxrd1.sdcc.bnl.gov:1095//<your-discovered-file>.root and list the members of the ReconstructedChargedParticles collection.
 ```
 
 ::::::::::::::: solution
 
-The assistant calls `get_file_structure` (returning the `events` tree) then `get_tree_info`, and
-reports something like:
+The assistant reads the structure of the `events` tree and reports something like:
 
 ```output
-File:  root://dtn-eic.jlab.org//…/<dataset-file>.root
+File:  root://epicxrd1.sdcc.bnl.gov:1095//…/<dataset-file>.root
 Tree:  events   — branches grouped by collection
 
 ReconstructedChargedParticles collection:
@@ -304,11 +218,10 @@ ReconstructedChargedParticles collection:
   ReconstructedChargedParticles.momentum.x   float[]   p_x [GeV]
   ReconstructedChargedParticles.momentum.y   float[]   p_y [GeV]
   ReconstructedChargedParticles.momentum.z   float[]   p_z [GeV]
-(each member has a companion nReconstructedChargedParticles.* count branch)
+  … energy, charge, mass, type, referencePoint.*, covMatrix.*
 ```
 
-The names are read from the file, not inferred — eliminating the schema-hallucination failure mode
-from Episode 1. These *are* the branches you're looking for.
+The names come from the file, so the assistant does not have to guess them.
 
 :::::::::::::::
 
@@ -318,16 +231,16 @@ from Episode 1. These *are* the branches you're looking for.
 
 ## Exercise: identify the species present (≈ 10 min)
 
-Issue the request:
+Ask:
 
 ```{.ai-prompt}
-Histogram ReconstructedChargedParticles.PDG so I can see the reconstructed particle species in the file.
+Histogram ReconstructedChargedParticles.PDG with one bin per integer code, so I can see the reconstructed particle species in the file.
 ```
 
 ::::::::::::::: solution
 
-The assistant calls `histogram_branch`. The distribution is discrete — spikes at the PDG codes
-present. Counting over a reconstructed-DIS file gives, for example:
+The assistant makes a histogram with one bin per PDG code. A reconstructed-DIS file gives, for
+example:
 
 ```output
    PDG  species   count
@@ -345,8 +258,8 @@ present. Counting over a reconstructed-DIS file gives, for example:
 ![Reconstructed charged-particle species in the file](fig/pdg_species.svg){alt='Bar histogram of reconstructed charged-particle PDG codes in the file, with pions dominating and protons rare'}
 
 Pions dominate; **protons are rare** (≈ 2%), so the Λ⁰ signal will be small. A sizeable fraction of
-tracks carry **no PID** (code 0) or a wrong one — misidentification that feeds the combinatorial
-background and is why we *fit* the peak rather than count it.
+tracks have **no PID** (code 0) or a wrong one. This misidentification adds to the combinatorial
+background, which is why we fit the peak instead of counting it.
 
 :::::::::::::::
 
@@ -356,44 +269,20 @@ background and is why we *fit* the peak rather than count it.
 
 ## Verify the returned quantities
 
-Inspect the returned numbers — bin edges, counts, statistics: do the PDG peaks fall at physical
-codes, and are the proton and pion yields plausible? [Episode 4](04-skills.md) formalises this as
+Look at the returned numbers (bin edges, counts, statistics). Do the PDG peaks fall at physical
+codes, and are the proton and pion yields plausible? [Episode 4](04-skills.md) turns this into
 explicit success criteria.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-## One data model, several access paths
+The same Λ⁰ peak can be obtained without MCP, with ROOT RDataFrame, TTreeReader, plain uproot, or
+the PODIO Frame API; scripts are in [`extras/`](https://github.com/eic/tutorial-mcp/tree/main/extras).
 
-ePIC data follow the **PODIO** model (EDM4eic): an `events` tree whose branches are per-event
-collections such as `ReconstructedChargedParticles` and `MCParticles`. We read it with **uproot**
-because that needs only eic-shell — no compiled framework. uproot is one of several equivalent access
-paths.
-
-::::::::::::::::::::::::::::::::::::::::::::: callout
-
-## Equivalent implementations
-
-The same Λ⁰ peak comes out of:
-
-* **ROOT RDataFrame** — declarative, columnar, parallel;
-* **ROOT TTreeReader** — an explicit event loop;
-* **bare uproot** — Python with no tool server; and
-* **the PODIO Frame API** — the native interface.
-
-Worked implementations of each are in
-[Alternative analysis approaches](../learners/analysis-approaches.md).
-
-:::::::::::::::::::::::::::::::::::::::::::::
-
-The assistant can now query the data through a verifiable interface. The next episode captures this
-procedure as a reusable, versioned **skill**.
+The next episode writes this procedure down as a **skill**.
 
 ::::::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- MCP is a JSON-RPC client–server protocol; a server exposes tools, resources, and prompts to any compliant client.
-- The uproot server returns compact, JSON-serialisable summaries rather than raw arrays, which keeps results inspectable.
-- `execute_kernel` runs client-supplied Python in a restricted sandbox: no imports or I/O, only NumPy/awkward, with a timeout.
-- The servers run inside eic-shell (`eic-mcp up`) and speak streamable HTTP; opencode and other clients connect to the same `127.0.0.1` URLs (`eic-mcp config <client>`).
-- PODIO/uproot is one access path; RDataFrame, TTreeReader, and bare uproot give the same result (see the extras).
+- MCP servers give an assistant tools; any MCP-capable assistant can use them.
+- `eic-mcp up` starts the servers in eic-shell and `eic-mcp config opencode` connects opencode.
 
 :::::::::::::::::::::::::::::::::::::::::::::
