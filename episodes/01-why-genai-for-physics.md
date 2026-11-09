@@ -50,21 +50,20 @@ pre.ai-prompt::before, div.sourceCode.ai-prompt::before {
 - How does an agentic assistant differ from a chat model?
 - What are the parts of an LLM "harness"?
 - What loops sit around the agent loop, and what does each add?
-- How do we get trustworthy results from a stochastic model?
-- Why build on an open protocol, not one product?
+- How do we check results from a model whose output varies between runs?
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::: objectives
 
 - Trace one pass of the agent loop for a physics task, naming what enters the context at each step.
-- Draft acceptance criteria precise enough that a grader — human or agent — can apply them.
+- Write acceptance criteria precise enough for a person or another agent to check.
 - Place a given automation (a format-on-edit hook, a nightly report, a prompt tweak) at the right loop level.
 - Choose between a tool, a skill, and a subagent when adding a new capability.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-## The bottleneck is rarely the physics
+## Where the time goes
 
 In a typical analysis the physics steps are few: select a final state, build an observable, fit a
 signal. Most of the time goes into the software around them: finding datasets, learning the data
@@ -93,8 +92,7 @@ running analyses.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-This loop is the first of four. Each one wraps the one before it, and this episode goes through
-them in order.
+This loop is the innermost of four nested loops, described below.
 
 ## Level 1 — the agent loop
 
@@ -119,8 +117,7 @@ flowchart TD
 
 The model together with the software that runs this cycle is called a **harness**. It has four parts:
 
-* **Model**: reasoning and code generation. The provider and model can be swapped; they are not
-  part of the method.
+* **Model**: generates text and code. It can be replaced by another model.
 * **Context**: everything the model sees in a step: instructions, files, earlier turns, tool
   outputs. Its size is limited (the *context window*).
 * **Tools**: operations the model may call. Tools are the only way the model can change anything
@@ -130,7 +127,7 @@ The model together with the software that runs this cycle is called a **harness*
 
 ### Extending the harness
 
-Current assistants add a few standard extension points to this core.
+Most assistants also support the following extensions.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'fontSize':'15px','lineColor':'#94a3b8','edgeLabelBackground':'#e2e8f0','clusterBkg':'#1f293720','clusterBorder':'#94a3b8','titleColor':'#94a3b8'}}}%%
@@ -138,6 +135,7 @@ flowchart TB
     accTitle: {AI agent harness}
     accDescr: {AI agent harness}
     MCP["MCP servers<br/>external tools & data"]:::tool --> H
+    SK["skills<br/>procedures loaded on demand"]:::tool --> H
     SUB["subagents<br/>specialized, isolated context"]:::tool --> H
     HOOKS["hooks<br/>lifecycle automation"]:::tool --> H
     MON["monitors<br/>watch & react"]:::tool --> H
@@ -150,8 +148,7 @@ flowchart TB
   assistant gets physics tools ([Episode 3](03-mcp-servers.md)).
 * **Subagents**: separate assistants started for a sub-task, so a large task can be split up.
 * **Skills**: versioned *procedures* (a `SKILL.md` plus scripts) loaded when a request matches
-  ([Episode 4](04-skills.md)). A tool is a capability; a skill is a recipe.
-
+  ([Episode 4](04-skills.md)).
 * **Hooks**: scripts the harness runs at fixed moments, e.g. reformat code after every edit or log
   each tool call.
 * **Monitors**: watch background work, e.g. a long batch job, and call the assistant again when it
@@ -185,13 +182,12 @@ resolution, $\chi^2/\mathrm{ndf}$ of order 1. In [Episode 4](04-skills.md) you w
 lambda-fit skill's **success criteria**. An agent that passes reports the numbers; one that fails
 must report the failure instead of a result.
 
-Grading costs time and tokens, but in physics analysis correctness matters more than speed. Prefer
-tools that return small quantities you can inspect (counts, bin edges, fit parameters), and keep a
+Grading costs time and tokens. Prefer tools that return small quantities you can inspect (counts, bin edges, fit parameters), and keep a
 record of what was run.
 
 ## Level 3 — the operation loop
 
-With verification in place, the agent no longer needs you to start it. In a third loop an event
+Once results are checked automatically, the agent can also be started without you. In a third loop an event
 (a schedule, a finished production job, a new pull request) starts the agent, its verified output updates something (a report, a documentation page, an alert), and the
 system goes back to waiting.
 
@@ -213,14 +209,14 @@ schedule, and reviews triggered per pull request.
 
 ## Level 4 — the improvement loop
 
-The last loop goes around everything. From time to time, look at what the agent actually did
-(transcripts, failed fits, wrong tool choices) and change the **harness** accordingly: clarify
+In the outer loop you periodically review what the agent did (transcripts, failed fits, wrong tool
+choices) and change the **harness**: clarify
 `AGENTS.md`, tighten a skill's success criteria, add a missing tool. You do a small version of this
 whenever a prompt goes wrong and you fix the instructions instead of retyping the request.
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
 
-## Where a human belongs in each loop
+## Human checkpoints
 
 Each level has a point where a person should decide: approving a sensitive tool call (1), signing
 off a graded result (2), reviewing what runs unattended (3), and choosing which harness changes to

@@ -48,7 +48,7 @@ pre.ai-prompt::before, div.sourceCode.ai-prompt::before {
 ::::::::::::::::::::::::::::::::::::::::::::: questions
 
 - Which other MCP servers does EIC provide?
-- How can you use them without any setup?
+- How can you use them without installing anything?
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
@@ -161,12 +161,12 @@ Searches the ePIC source code through the [LXR browser](https://eic-code-browser
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-## No setup: the DISpatcher bot
+## The DISpatcher bot
 
 **DISpatcher** is a Mattermost bot ([chat.epic-eic.org → `dispatcher`](https://chat.epic-eic.org/main/channels/dispatcher)) that anyone in ePIC can use, in the channel or by DM. It has the data tools from this lesson plus tools for production jobs, physics samples, software, and documents.
 
-Post this in the `dispatcher` channel or DM the bot. Your own assistant has no PCS tool and would
-have to invent the answer:
+Example question for the channel or a DM (your local assistant has no PCS tool, so it cannot
+answer this):
 
 ```{.ai-prompt}
 Summarize the physics tags in the PCS: which processes are covered, and which tags are still draft?
@@ -181,6 +181,6 @@ The [EIC software portal](https://eic.github.io/) also has an AI search box ("As
 ::::::::::::::::::::::::::::::::::::::::::::: keypoints
 
 - EIC provides more MCP servers than the three used here.
-- The DISpatcher bot in Mattermost gives you these tools without any setup.
+- The DISpatcher bot in Mattermost gives you these tools without local setup.
 
 :::::::::::::::::::::::::::::::::::::::::::::

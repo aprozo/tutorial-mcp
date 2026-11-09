@@ -199,7 +199,7 @@ the `root://` URLs from the previous exercise (written below as
 
 ## Exercise: enumerate the schema (≈ 10 min)
 
-Issue the request:
+Ask:
 
 ```{.ai-prompt}
 Using the uproot tools, report the structure of the events tree in root://epicxrd1.sdcc.bnl.gov:1095//<your-discovered-file>.root and list the members of the ReconstructedChargedParticles collection.
@@ -221,7 +221,7 @@ ReconstructedChargedParticles collection:
   … energy, charge, mass, type, referencePoint.*, covMatrix.*
 ```
 
-The names are read from the file, not guessed, so the assistant cannot invent branch names.
+The names come from the file, so the assistant does not have to guess them.
 
 :::::::::::::::
 
@@ -231,7 +231,7 @@ The names are read from the file, not guessed, so the assistant cannot invent br
 
 ## Exercise: identify the species present (≈ 10 min)
 
-Issue the request:
+Ask:
 
 ```{.ai-prompt}
 Histogram ReconstructedChargedParticles.PDG with one bin per integer code, so I can see the reconstructed particle species in the file.
@@ -278,12 +278,11 @@ explicit success criteria.
 The same Λ⁰ peak can be obtained without MCP, with ROOT RDataFrame, TTreeReader, plain uproot, or
 the PODIO Frame API; scripts are in [`extras/`](https://github.com/eic/tutorial-mcp/tree/main/extras).
 
-The assistant can now query the data through tools whose output you can check. The next episode
-writes this procedure down as a reusable, versioned **skill**.
+The next episode writes this procedure down as a **skill**.
 
 ::::::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- MCP servers give an assistant tools; any MCP assistant can use them.
+- MCP servers give an assistant tools; any MCP-capable assistant can use them.
 - `eic-mcp up` starts the servers in eic-shell and `eic-mcp config opencode` connects opencode.
 
 :::::::::::::::::::::::::::::::::::::::::::::

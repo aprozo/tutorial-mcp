@@ -47,15 +47,15 @@ pre.ai-prompt::before, div.sourceCode.ai-prompt::before {
 
 ::::::::::::::::::::::::::::::::::::::::::::: questions
 
-- How do assistant + server + skill compose into one analysis?
-- How does the kernel scale from one file to the full sample?
-- How is the yield extracted and made reproducible?
+- How do the assistant, the servers, and the skill work together?
+- How does the analysis run over many files?
+- How is the yield extracted and recorded?
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::: objectives
 
-- Set up any MCP client for the end-to-end run in three steps.
+- Set up an MCP client for the analysis.
 - Scale the analysis from one file to a full dataset.
 - Accept or reject an agent-produced yield using the audit checklist.
 
@@ -77,9 +77,9 @@ opencode
 Check that `/mcp` lists `uproot`, `xrootd`, and `rucio`, then paste the prompts below. For Claude
 Code, use `eic-mcp config claude` and `.claude/skills/`.
 
-## The composed pipeline
+## The pipeline
 
-The skill (Episode 4) gives the steps, the uproot server (Episode 3) reads the data, and the agent loop (Episode 1) runs and checks it.
+The skill (Episode 4) lists the steps, the uproot server (Episode 3) reads the data, and the agent loop (Episode 1) runs and checks them.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'fontSize':'15px','lineColor':'#94a3b8','edgeLabelBackground':'#e2e8f0','clusterBkg':'#1f293720','clusterBorder':'#94a3b8','titleColor':'#94a3b8'}}}%%
@@ -87,16 +87,16 @@ flowchart LR
     accTitle: {End-to-end agent run}
     accDescr: {End-to-end agent run}
     A["resolve input<br/>root:// file or file list"]:::data --> B["build m(p,π) histogram<br/>uproot MCP"]:::tool
-    B --> C["fit Gaussian + poly-2<br/>opencode prompt"]:::tool
+    B --> C["fit Gaussian + poly-2<br/>uproot MCP"]:::tool
     C --> D["report μ, σ, S, χ²/ndf<br/>+ plot + provenance"]:::out
     classDef data fill:#fff4e0,stroke:#f08c00,stroke-width:1.5px,color:#5c3b00;
     classDef tool fill:#e6f7ed,stroke:#2f9e44,stroke-width:1.5px,color:#0b3d1f;
     classDef out fill:#f3e8ff,stroke:#7048e8,stroke-width:1.5px,color:#2e1065;
 ```
 
-## One file, end to end
+## One file
 
-With the three servers running and the lambda-fit skill available, one request runs the whole chain. Point it at one of the dataset's `root://` files. The assistant uses `rucio` tools to find a DIS dataset and `list_file_replicas` for the URLs, `xrootd` to confirm the file is there, then reads it in place:
+Give the assistant one `root://` file from the dataset you found in Episode 3:
 
 ```{.ai-prompt}
 Using the lambda-fit skill, measure the Lambda0 peak in this file:
@@ -107,7 +107,7 @@ fit it, and report mu, sigma, the yield, and chi2/ndf, with the plot, or report 
 statistics if the fit window is too sparse.
 ```
 
-The assistant builds the histogram with the uproot server, then fits it. If your model stops after the histogram (small models do), paste the fit as its own request:
+The assistant builds the histogram with the uproot server, then fits it. If the model stops after the histogram (smaller models often do), send the fit as a separate request:
 
 ```{.ai-prompt}
 Fit the histogram you just built with execute_kernel: a Gaussian plus a 2nd-order polynomial
@@ -119,9 +119,9 @@ One file gives only ~8 candidates in the fit window, so the correct answer is *i
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
 
-## Smaller models take shortcuts: check the result, not the route
+## Different tool choices
 
-A smaller model may call different tools than the skill says and still get the same histogram. The audit checklist below judges the result, not the route.
+A smaller model may call different tools than the skill specifies and still produce the same histogram. The audit checklist below checks the result, not which tools were used.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
@@ -146,7 +146,7 @@ fetch the histograms with get_job_result and merge them, then fit and report mu,
 the yield, and chi2/ndf for both Lambda and anti-Lambda, with the plot.
 ```
 
-Over ~100 files this gives the reference spectrum below: a clear Λ⁰ (and Λ̄) peak over the combinatorial background.
+With ~100 files the Λ⁰ and Λ̄ peaks are visible above the combinatorial background:
 
 ![Fitted Λ⁰ and Λ̄ invariant-mass spectra (reference fit)](fig/lambda_fit.svg){alt='Proton–pion invariant-mass spectrum with Gaussian-plus-polynomial fits showing clear Lambda and anti-Lambda peaks near 1.1157 GeV'}
 
@@ -165,9 +165,7 @@ $$
 f(m) = A \exp\!\left[ -\tfrac{1}{2} (m - \mu)^2 / \sigma^2 \right] + \left( c_0 + c_1 (m - m_\Lambda) + c_2 (m - m_\Lambda)^2 \right)
 $$
 
-The polynomial absorbs the combinatorial background (Episode 2); the integrated signal is $S = A\sqrt{2\pi}\,\sigma / (\text{bin width})$. Report $S$ with its uncertainty alongside $\mu$, $\sigma$, and $\chi^2/\text{ndf}$; a bare bin count mixes signal with background.
-
-## Audit
+The polynomial describes the combinatorial background (Episode 2); the integrated signal is $S = A\sqrt{2\pi}\,\sigma / (\text{bin width})$. Report $S$ with its uncertainty alongside $\mu$, $\sigma$, and $\chi^2/\text{ndf}$; a bare bin count mixes signal with background.
 
 ::::::::::::::::::::::::::::::::::::::::::::: callout
 
@@ -176,12 +174,12 @@ The polynomial absorbs the combinatorial background (Episode 2); the integrated 
 * **Signal.** $\mu$ within a few MeV of 1.115683 GeV; $\sigma$ consistent with detector resolution; $\chi^2/\text{ndf}$ of order unity; $S$ reported with an uncertainty.
 * **Inputs pinned.** Dataset (campaign and file list), particle masses, mass window, binning, and fit range all fixed and recorded.
 * **Provenance.** Tool calls and their arguments logged, so the run can be reconstructed.
-* **Cost bounded.** A few files during development before scaling up.
-* **Oversight.** A human inspected the fit before the result was reported.
+* **Cost limited.** Tested on a few files before scaling up.
+* **Human check.** Someone looked at the fit before the result was reported.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-## Exercises (specification)
+## Exercises
 
 * Run the single-file chain through your assistant and report $\mu$, $\sigma$, $S$, and $\chi^2/\text{ndf}$.
 * Process 8 files and compare the fit to the ~100-file result; comment on the statistical uncertainty.
@@ -200,7 +198,7 @@ The [final episode](06-eic-mcp-servers.md) lists the other MCP servers the EIC p
 
 ::::::::::::::::::::::::::::::::::::::::::::: keypoints
 
-- One prompt runs the whole Λ⁰ analysis, from one file up to the full dataset.
+- With the lambda-fit skill, the same prompt runs the analysis on one file or on many.
 - Check the fit against the audit checklist before you trust it.
 
 :::::::::::::::::::::::::::::::::::::::::::::

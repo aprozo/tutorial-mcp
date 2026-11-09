@@ -47,25 +47,25 @@ pre.ai-prompt::before, div.sourceCode.ai-prompt::before {
 
 ::::::::::::::::::::::::::::::::::::::::::::: questions
 
-- How do you give an assistant durable project context?
+- How do you give an assistant project context that persists between sessions?
 - AGENTS.md or SKILL.md: when to use each?
 - How do you make every tool read the same rules?
-- What's in a usable SKILL.md for the Λ⁰ fit?
+- What goes into a SKILL.md for the Λ⁰ fit?
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::: objectives
 
 - Write an AGENTS.md for always-on project context.
-- Bridge it so one AGENTS.md drives any tool.
+- Make other tools read the same AGENTS.md.
 - Write a SKILL.md that runs the Λ⁰ fit on demand.
-- Encode success criteria + provenance for auditable output.
+- Add success criteria and a provenance section to the skill.
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
 ## Two ways to make instructions persistent
 
-Typed requests (Episode 3) have to repeat the data model, conventions, and procedure every session, and two runs can differ. Two kinds of file solve this.
+Typed requests (Episode 3) have to repeat the data model, conventions, and procedure every session, and two runs can differ. Two kinds of file store these instructions.
 
 * **`AGENTS.md`**: **context** read at the start of every session: environment, data model, conventions, and what "done" means.
 * **`SKILL.md`**: a **procedure** in a named skill directory, loaded only when a request matches its description. It describes one repeatable workflow.
@@ -90,7 +90,7 @@ flowchart TD
 
 `AGENTS.md` is plain Markdown at your project root (subdirectories may override it for files beneath them). opencode, Codex, Gemini CLI, Zed, and others read it automatically; a tool that looks for a different filename reads the same content through a one-line bridge (next section).
 
-It is loaded on every turn, so keep it short and factual:
+An example:
 
 ```markdown
 # AGENTS.md — Lambda analysis project
@@ -152,7 +152,7 @@ It records the schema, the tool policy (use the server, not hand-written I/O), t
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-## One source of truth: bridge files
+## Bridge files for other tools
 
 opencode, Codex, Gemini CLI, and Zed read `AGENTS.md`. Some tools read only their own file: GitHub Copilot reads `copilot-instructions.md`, Cursor reads `.cursorrules`. Without it they run with no context and no warning.
 
@@ -176,7 +176,7 @@ skills/
 
 The procedure only uses the MCP tools, so it needs no scripts of its own.
 
-The YAML frontmatter has a `name` and a `description`. The client matches your request against the `description` to decide whether to load the skill. **Only the name and description stay in context**; the body is read only when the description matches.
+The YAML frontmatter has a `name` and a `description`. Only these two stay in context; the client reads the body when a request matches the `description`.
 
 ```markdown
 ---
@@ -245,15 +245,15 @@ Clients without a skill mechanism can reference the procedure from `AGENTS.md` i
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-Get both example files in place: [`files/skills/AGENTS.md`](https://github.com/eic/tutorial-mcp/blob/main/files/skills/AGENTS.md) (download it to your analysis directory) and [`files/skills/lambda-fit/SKILL.md`](https://github.com/eic/tutorial-mcp/blob/main/files/skills/lambda-fit/SKILL.md) (download it as above).
+Both example files are in the repository: [`files/skills/AGENTS.md`](https://github.com/eic/tutorial-mcp/blob/main/files/skills/AGENTS.md) (goes in your analysis directory) and [`files/skills/lambda-fit/SKILL.md`](https://github.com/eic/tutorial-mcp/blob/main/files/skills/lambda-fit/SKILL.md).
 
 ## Your project layout
 
-A project that behaves the same under any assistant:
+The resulting project:
 
 ```bash
 lambda-analysis/
-├── AGENTS.md                        # source of truth: context + conventions (write this)
+├── AGENTS.md                        # project context and conventions (write this)
 ├── .github/
 │   └── copilot-instructions.md      # points to AGENTS.md   (bridge for Copilot)
 ├── .cursorrules                     # points to AGENTS.md   (bridge for Cursor)
@@ -330,7 +330,7 @@ The kernel can return the pair count next to the histogram
 
 :::::::::::::::::::::::::::::::::::::::::::::
 
-The [next episode](05-end-to-end-agents.md) runs this skill end to end and scales it from one file to the full sample.
+The [next episode](05-end-to-end-agents.md) runs this skill on one file and then on many.
 
 ::::::::::::::::::::::::::::::::::::::::::::: keypoints
 
