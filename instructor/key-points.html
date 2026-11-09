@@ -40,7 +40,10 @@
   <div class="container-fluid top-nav-container">
     <div class="col-md-8">
       <div class="large-logo">
-        <img id="incubator-logo" alt="Generative AI for ePIC physics analysis" src="../assets/images/incubator-logo.svg"><span class="badge text-bg-info">
+        <a href="index.html">
+        <img id="incubator-logo" alt="Generative AI for ePIC physics analysis" src="../assets/images/incubator-logo.svg"></a>
+
+        <span class="badge text-bg-info">
           <abbr title="This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.">
             <a href="https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html" class="external-link alert-link">
               <i aria-hidden="true" class="icon" data-feather="alert-circle" style="border-radius: 5px"></i>
@@ -96,8 +99,9 @@
       <span class="menu-title">Menu</span>
     </button>
     <div class="nav-logo">
-      <img class="small-logo" alt="Generative AI for ePIC physics analysis" src="../assets/images/incubator-logo-sm.svg">
-</div>
+      <a href="index.html">
+      <img class="small-logo" alt="Generative AI for ePIC physics analysis" src="../assets/images/incubator-logo-sm.svg"></a>
+    </div>
     <div class="lesson-title-md">
       Generative AI for Physics Analysis
     </div>
@@ -128,9 +132,6 @@
           </button>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 <hr>
-<li><a class="dropdown-item" href="about-the-physics.html">Physics reference: Λ⁰ → p π⁻</a></li>
-<li><a class="dropdown-item" href="analysis-approaches.html">Alternative Analysis Approaches</a></li>
-<li><a class="dropdown-item" href="discuss.html">Discussion</a></li>
 <li><a class="dropdown-item" href="reference.html">Reference</a></li>
           </ul>
 </li>
@@ -146,7 +147,7 @@
       </fieldset>
     </form>
     -->
-    <a id="search-button" class="btn btn-primary" href="../instructor/aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
+    <a id="search-button-nav" class="btn btn-primary" href="../instructor/aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div>
 <!--/div.container-fluid -->
 </nav><div class="container">
@@ -158,6 +159,9 @@
           <i class="search-icon" data-feather="x" role="img"></i>
         </button>
         <div class="sidebar-inner">
+          <div class="row mobile-row" id="theme-row-mobile">
+            <a id="search-button-sidebar" class="btn btn-primary" href="../instructor/aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
+          </div>
           <div class="row mobile-row" id="theme-row-mobile">
             <menu class="col theme-selector" id="theme-selector-sidebar">
 <li class="nav-item dropdown theme-button-list" id="theme-button-list-sidebar">
@@ -206,6 +210,7 @@
 <!--/div.accordion-item-->
                 </div>
 <!--/div.accordion-flush-->
+
               </div>
 <!--div.sidenav-view-selector -->
             </div>
@@ -300,7 +305,7 @@
 <div class="accordion accordion-flush" id="accordionFlush7">
   <div class="accordion-item">
     <div class="accordion-header" id="flush-heading7">
-        <a href="06-eic-mcp-servers.html">6. Catalogue: MCP servers and AI infrastructure in the EIC ecosystem</a>
+        <a href="06-eic-mcp-servers.html">6. Catalog: MCP servers and AI infrastructure in the EIC ecosystem</a>
     </div>
 <!--/div.accordion-header-->
 
@@ -314,6 +319,34 @@
             </div>
 
             <hr class="half-width">
+<div class="accordion accordion-flush" id="accordion-links-toggle">
+                <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-heading-links-toggle">
+                  <button class="accordion-button collapsed" id="links" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-links-toggle" aria-expanded="false" aria-controls="flush-collapse-links-toggle">
+                    LINKS
+                  </button>
+                </h2>
+                <div id="flush-collapse-links-toggle" class="accordion-collapse show collapse" data-bs-parent="#accordion-links-toggle">
+                    <div class="accordion-body">
+                        <ul>
+<li>
+                            <a href="../instructor/key-points.html">Key Points</a>
+                            </li>
+                            <li>
+                            <a href="../instructor/instructor-notes.html">Instructor Notes</a>
+                            </li>
+                            <li>
+                            <a href="../instructor/images.html">Extract All Images</a>
+                            </li>
+                        </ul>
+</div>
+                </div>
+                </div>
+<!--/div.accordion-item-->
+            </div>
+<!--/div.accordion-flush-->
+
+            <hr class="half-width">
 <div class="accordion accordion-flush lesson-resources" id="accordion-resources-toggle">
               <div class="accordion-item">
                 <h2 class="accordion-header" id="flush-heading-resources-toggle">
@@ -324,19 +357,7 @@
                 <div id="flush-collapse-resources-toggle" class="accordion-collapse collapse" data-bs-parent="#accordion-resources-toggle">
                   <div class="accordion-body">
                     <ul>
-<li>
-                        <a href="../instructor/key-points.html">Key Points</a>
-                      </li>
-                      <li>
-                        <a href="../instructor/instructor-notes.html">Instructor Notes</a>
-                      </li>
-                      <li>
-                        <a href="../instructor/images.html">Extract All Images</a>
-                      </li>
-                      <hr>
-<li><a class="dropdown-item" href="about-the-physics.html">Physics reference: Λ⁰ → p π⁻</a></li>
-<li><a class="dropdown-item" href="analysis-approaches.html">Alternative Analysis Approaches</a></li>
-<li><a class="dropdown-item" href="discuss.html">Discussion</a></li>
+<hr>
 <li><a class="dropdown-item" href="reference.html">Reference</a></li>
                     </ul>
 </div>
@@ -370,84 +391,44 @@
 <section id="01-why-genai-for-physics"><h2 class="section-heading"><a href="01-why-genai-for-physics.html">Generative AI as an agentic research tool</a></h2>
 <hr class="half-width">
 <ul>
-<li>A conversational model returns text; an agentic harness executes
-tools and conditions on their output.</li>
-<li>Level 1, the agent loop, runs in a harness with four parts: the
-model, the context window, a set of typed tools, and a control loop —
-extended by MCP tools, subagents, skills, hooks, and monitors.</li>
-<li>Level 2 wraps the agent in a verification loop: a grader checks each
-result against explicit success criteria, because stochastic output must
-be treated as a hypothesis, not an answer.</li>
-<li>Level 3 runs the verified agent on events and schedules; level 4
-feeds what actually happened back into the harness, where gains
-compound.</li>
-<li>Building on the open Model Context Protocol keeps tools portable
-across assistants and supports reproducibility.</li>
+<li>An agentic assistant runs tools and reads their output; a chat model
+only returns text.</li>
+<li>Treat every result as a hypothesis and check it against clear
+criteria before you accept it.</li>
 </ul></section><section id="02-your-ai-coding-setup"><h2 class="section-heading"><a href="02-your-ai-coding-setup.html">The measurement: Λ⁰ → p π⁻</a></h2>
 <hr class="half-width">
 <ul>
-<li>The observable is the p π⁻ invariant mass; the Λ⁰ appears as a
-narrow peak over a combinatorial background.</li>
-<li>The peak width is set by detector resolution, not the negligible Λ⁰
-natural width.</li>
-<li>The data are EDM4eic collections in an <code>events</code> tree;
-momenta are in GeV.</li>
+<li>The Λ⁰ shows up as a peak at 1.1157 GeV in the proton–pion invariant
+mass.</li>
+<li>The peak width comes from detector resolution.</li>
 </ul></section><section id="03-mcp-servers"><h2 class="section-heading"><a href="03-mcp-servers.html">Tool servers and the Model Context Protocol (MCP)</a></h2>
 <hr class="half-width">
 <ul>
-<li>MCP is a JSON-RPC client–server protocol; a server exposes tools,
-resources, and prompts to any compliant client.</li>
-<li>The uproot server returns compact, JSON-serialisable summaries
-rather than raw arrays, which keeps results inspectable.</li>
+<li>MCP servers give an assistant tools; any MCP-capable assistant can
+use them.</li>
 <li>
-<code>execute_kernel</code> runs client-supplied Python in a
-restricted sandbox: no imports or I/O, only NumPy/awkward, with a
-timeout.</li>
-<li>The servers run inside eic-shell (<code>eic-mcp up</code>) and speak
-streamable HTTP; opencode and other clients connect to the same
-<code>127.0.0.1</code> URLs
-(<code>eic-mcp config &lt;client&gt;</code>).</li>
-<li>PODIO/uproot is one access path; RDataFrame, TTreeReader, and bare
-uproot give the same result (see the extras).</li>
+<code>eic-mcp up</code> starts the servers in eic-shell and
+<code>eic-mcp config opencode</code> connects opencode.</li>
 </ul></section><section id="04-skills"><h2 class="section-heading"><a href="04-skills.html">Persisting instructions: AGENTS.md and SKILL.md</a></h2>
 <hr class="half-width">
 <ul>
-<li>AGENTS.md is always-loaded project context; a SKILL.md is a named
-procedure loaded on demand.</li>
-<li>Keep one source of truth (AGENTS.md) and point tool-specific files
-(copilot-instructions.md, .cursorrules) at it — never maintain
-duplicates.</li>
-<li>A skill’s frontmatter <code>description</code> is what the model
-matches against to decide when to load it.</li>
-<li>Encode inputs, steps, success criteria, and provenance so a result
-can be reproduced and audited.</li>
+<li>
+<code>AGENTS.md</code> holds project context; a
+<code>SKILL.md</code> holds a procedure the assistant loads when
+needed.</li>
+<li>Put success criteria in the skill so you can check the result.</li>
 </ul></section><section id="05-end-to-end-agents"><h2 class="section-heading"><a href="05-end-to-end-agents.html">An end-to-end, reproducible Λ⁰ analysis</a></h2>
 <hr class="half-width">
 <ul>
-<li>The full analysis composes Episodes 2–4: an assistant, the uproot
-MCP tools, and the lambda-fit skill.</li>
-<li>The same kernel scales from <code>execute_kernel</code> (one root://
-file) to <code>execute_kernel_dataset</code> (the full sample), merging
-into one histogram.</li>
-<li>The yield comes from a Gaussian-plus-polynomial fit; report <span class="math inline">\(\mu\)</span>, <span class="math inline">\(\sigma\)</span>, <span class="math inline">\(S\)</span>, and <span class="math inline">\(\chi^2/\text{ndf}\)</span>, not a bare count.</li>
-<li>Pinning inputs and recording tool calls make the measurement
-reproducible and auditable.</li>
-</ul></section><section id="06-eic-mcp-servers"><h2 class="section-heading"><a href="06-eic-mcp-servers.html">Catalogue: MCP servers and AI infrastructure in the EIC ecosystem</a></h2>
+<li>With the lambda-fit skill, the same prompt runs the analysis on one
+file or on many.</li>
+<li>Check the fit against the audit checklist before you trust it.</li>
+</ul></section><section id="06-eic-mcp-servers"><h2 class="section-heading"><a href="06-eic-mcp-servers.html">Catalog: MCP servers and AI infrastructure in the EIC ecosystem</a></h2>
 <hr class="half-width">
 <ul>
-<li>The EIC exposes its infrastructure through MCP: analysis (uproot),
-data (xrootd, rucio), records (zenodo, indico), code (LXR + GitHub), and
-production (PanDA, PCS) — three of which you ran yourself.</li>
-<li>The DISpatcher bot is the zero-setup path: ~100 MCP tools behind a
-Mattermost account, no client configuration at all.</li>
-<li>corun-ai/codoc-ai is the long-latency complement: high-level models,
-preserved and expert-curated outputs, grounded in nightly-indexed code
-knowledge.</li>
-<li>Patterns to reuse: tiered tool exposure (context economy at scale)
-and the secret-token fabrication check (verification over confidence,
-enforced).</li>
-<li>This catalogue dates quickly — check the eic GitHub organisation and
-the ePIC dev-cloud for the current list.</li>
+<li>EIC provides more MCP servers than the three used here.</li>
+<li>The DISpatcher bot in Mattermost gives you these tools without local
+setup.</li>
 </ul></section>
 </div>
     </main>
@@ -475,7 +456,7 @@ the ePIC dev-cloud for the current list.</li>
         <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/" class="external-link">varnish (1.1.1)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.21.1)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/" class="external-link">varnish (1.1.3)</a></p>
 		</div>
 		</footer>
 </div> <!-- / div.container -->
@@ -498,8 +479,8 @@ the ePIC dev-cloud for the current list.</li>
   "url": "https://eic.github.io/tutorial-mcp/instructor/key-points.html",
   "identifier": "https://eic.github.io/tutorial-mcp/instructor/key-points.html",
   "dateCreated": "2026-06-04",
-  "dateModified": "2026-08-25",
-  "datePublished": "2026-08-25"
+  "dateModified": "2026-11-09",
+  "datePublished": "2026-11-09"
 }
 
   </script><script>

@@ -40,7 +40,10 @@
   <div class="container-fluid top-nav-container">
     <div class="col-md-8">
       <div class="large-logo">
-        <img id="incubator-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo.svg"><span class="badge text-bg-info">
+        <a href="index.html">
+        <img id="incubator-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo.svg"></a>
+
+        <span class="badge text-bg-info">
           <abbr title="This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.">
             <a href="https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html" class="external-link alert-link">
               <i aria-hidden="true" class="icon" data-feather="alert-circle" style="border-radius: 5px"></i>
@@ -96,8 +99,9 @@
       <span class="menu-title">Menu</span>
     </button>
     <div class="nav-logo">
-      <img class="small-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo-sm.svg">
-</div>
+      <a href="index.html">
+      <img class="small-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo-sm.svg"></a>
+    </div>
     <div class="lesson-title-md">
       Generative AI for Physics Analysis
     </div>
@@ -127,9 +131,6 @@
             More <i data-feather="chevron-down"></i>
           </button>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-<li><a class="dropdown-item" href="about-the-physics.html">Physics reference: Λ⁰ → p π⁻</a></li>
-<li><a class="dropdown-item" href="analysis-approaches.html">Alternative Analysis Approaches</a></li>
-<li><a class="dropdown-item" href="discuss.html">Discussion</a></li>
 <li><a class="dropdown-item" href="reference.html">Reference</a></li>
           </ul>
 </li>
@@ -145,7 +146,7 @@
       </fieldset>
     </form>
     -->
-    <a id="search-button" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
+    <a id="search-button-nav" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div>
 <!--/div.container-fluid -->
 </nav><div class="container">
@@ -157,6 +158,9 @@
           <i class="search-icon" data-feather="x" role="img"></i>
         </button>
         <div class="sidebar-inner">
+          <div class="row mobile-row" id="theme-row-mobile">
+            <a id="search-button-sidebar" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
+          </div>
           <div class="row mobile-row" id="theme-row-mobile">
             <menu class="col theme-selector" id="theme-selector-sidebar">
 <li class="nav-item dropdown theme-button-list" id="theme-button-list-sidebar">
@@ -205,6 +209,7 @@
 <!--/div.accordion-item-->
                 </div>
 <!--/div.accordion-flush-->
+
               </div>
 <!--div.sidenav-view-selector -->
             </div>
@@ -299,7 +304,7 @@
 <div class="accordion accordion-flush" id="accordionFlush7">
   <div class="accordion-item">
     <div class="accordion-header" id="flush-heading7">
-        <a href="06-eic-mcp-servers.html">6. Catalogue: MCP servers and AI infrastructure in the EIC ecosystem</a>
+        <a href="06-eic-mcp-servers.html">6. Catalog: MCP servers and AI infrastructure in the EIC ecosystem</a>
     </div>
 <!--/div.accordion-header-->
 
@@ -313,6 +318,34 @@
             </div>
 
             <hr class="half-width">
+<div class="accordion accordion-flush" id="accordion-links-toggle">
+                <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-heading-links-toggle">
+                  <button class="accordion-button collapsed" id="links" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-links-toggle" aria-expanded="false" aria-controls="flush-collapse-links-toggle">
+                    LINKS
+                  </button>
+                </h2>
+                <div id="flush-collapse-links-toggle" class="accordion-collapse show collapse" data-bs-parent="#accordion-links-toggle">
+                    <div class="accordion-body">
+                        <ul>
+<li>
+                            <a href="key-points.html">Key Points</a>
+                            </li>
+                            <li>
+                            <a href="reference.html#glossary">Glossary</a>
+                            </li>
+                            <li>
+                            <a href="profiles.html">Learner Profiles</a>
+                            </li>
+                        </ul>
+</div>
+                </div>
+                </div>
+<!--/div.accordion-item-->
+            </div>
+<!--/div.accordion-flush-->
+
+            <hr class="half-width">
 <div class="accordion accordion-flush lesson-resources" id="accordion-resources-toggle">
               <div class="accordion-item">
                 <h2 class="accordion-header" id="flush-heading-resources-toggle">
@@ -323,18 +356,6 @@
                 <div id="flush-collapse-resources-toggle" class="accordion-collapse collapse" data-bs-parent="#accordion-resources-toggle">
                   <div class="accordion-body">
                     <ul>
-<li>
-                        <a href="key-points.html">Key Points</a>
-                      </li>
-                      <li>
-                        <a href="reference.html#glossary">Glossary</a>
-                      </li>
-                      <li>
-                        <a href="profiles.html">Learner Profiles</a>
-                      </li>
-                      <li><a href="about-the-physics.html">Physics reference: Λ⁰ → p π⁻</a></li>
-<li><a href="analysis-approaches.html">Alternative Analysis Approaches</a></li>
-<li><a href="discuss.html">Discussion</a></li>
 <li><a href="reference.html">Reference</a></li>
                     </ul>
 </div>
@@ -372,17 +393,15 @@
 <p>This lesson is aimed at <strong>graduate students and
 researchers</strong> new to AI tooling. It assumes command-line comfort
 and introductory particle-physics background (four-momentum, invariant
-mass, histograms, fitting). It teaches a portable method — the agentic
-harness — applied to a real ePIC measurement (Λ⁰ → p π⁻), and is
-deliberately <strong>tool-agnostic</strong>: learners pick one assistant
-(opencode, Copilot, or Cursor) and everything else works through
-MCP.</p>
+mass, histograms, fitting). It teaches the agentic harness, applied to a
+real ePIC measurement (Λ⁰ → p π⁻). It is <strong>tool-agnostic</strong>:
+the lesson uses opencode, but any MCP client works.</p>
 </section><section><h2 class="section-heading" id="what-is-built-vs--outlined">What is built vs. outlined<a class="anchor" aria-label="anchor" href="#what-is-built-vs--outlined"></a>
 </h2>
 <hr class="half-width">
 <ul>
 <li>
-<strong>Episodes 1–3 are the hands-on core</strong> — the agentic
+<strong>Episodes 1–3 are the hands-on core</strong>: the agentic
 harness, the physics, and the MCP tool server (run, register, inspect,
 histogram).</li>
 <li>
@@ -394,29 +413,30 @@ histogram).</li>
 sample via <code>execute_kernel_dataset</code>, signal extraction, audit
 checklist), with a per-client setup section.</li>
 <li>
-<strong>Episode 6</strong> is a catalogue of the EIC MCP servers and
+<strong>Episode 6</strong> is a catalog of the EIC MCP servers and
 the corun-ai ecosystem.</li>
 </ul></section><section><h2 class="section-heading" id="before-the-workshop">Before the workshop<a class="anchor" aria-label="anchor" href="#before-the-workshop"></a>
 </h2>
 <hr class="half-width">
 <ul>
-<li>Make sure learners have <strong>eic-shell</strong> working and
-<strong>opencode</strong> installed with a free model connected (Setup
-page). Everything else runs inside eic-shell.</li>
+<li>Make sure learners have an up-to-date <strong>eic-shell</strong>
+(<code>./eic-shell --upgrade</code>); it contains the servers and
+<code>opencode</code>. The upgrade downloads gigabytes, so ask for it
+ahead of time.</li>
 <li>No JLab account or data download is needed: the <code>rucio</code>
 server signs in automatically with the shared read-only
 <code>eicread</code> account, and the assistant reads files over
 <code>root://</code> in place.</li>
-<li>Have learners run <code>eic-mcp up</code> once ahead of time — the
-first run bootstraps the three servers automatically, which takes a few
-minutes; every later start is seconds.</li>
+<li>The Episode 3 exercise pins a campaign (currently
+<code>26.04.1</code>). Campaigns retire: run the campaign-listing prompt
+from Episode 3 beforehand and bump the version in the exercise if
+production has moved on.</li>
 </ul></section><section><h2 class="section-heading" id="timing-and-pitfalls">Timing and pitfalls<a class="anchor" aria-label="anchor" href="#timing-and-pitfalls"></a>
 </h2>
 <hr class="half-width">
 <ul>
-<li>Total ≈ 2 h teaching + 1.5 h exercises (a half day). Episode 3 is
-the longest; budget time for the first <code>eic-mcp up</code> (one-time
-bootstrap) and connecting opencode to a model.</li>
+<li>Total ≈ 2 h 45 m teaching + 1.5 h exercises (a full day with
+breaks). Episode 3 is the longest.</li>
 <li>
 <strong>Common snag:</strong> the assistant stays in “one-shot” mode
 and only prints code. Have learners confirm <strong>Agent/edit
@@ -428,10 +448,29 @@ nothing, check <code>eic-mcp status</code> and that
 <code>eic-mcp config opencode</code>) is in the directory where
 <code>opencode</code> was launched.</li>
 <li>
-<strong>Statistics:</strong> peak clarity scales with how many
-<code>root://</code> files the assistant processes — a few files show a
-modest excess; tens of files give a clean fit. Set expectations
-accordingly.</li>
+<strong>Statistics:</strong> the peak gets clearer with more
+<code>root://</code> files: a few files show a small excess; tens of
+files give a clean fit. Set expectations accordingly.</li>
+<li>
+<strong>macOS learners:</strong> the container home is wiped when
+eic-shell exits, so keep work in the eic-shell folder. A client on the
+Mac itself needs the port edit from the Setup page.</li>
+<li>
+<strong>Free-tier throttling:</strong> at busy hours the free hosted
+models can take minutes per agent turn (the MCP tool context makes each
+request large). If the session drags, switch the class to another free
+model in the opencode picker, or keep one paid key as backup.</li>
+<li>
+<strong>Store outage:</strong> if rucio queries work but all
+xrootd/uproot file access times out, the XRootD store is likely down.
+Check with
+<code>xrdfs root://epicxrd1.sdcc.bnl.gov:1095 ls /eic/EPIC/RECO</code>
+before the session, and have a fallback ready (Episodes 1–2 material, or
+a locally cached file). BNL disk serves campaigns 25.12.0 onward (the
+<code>eic-mcp</code> default); the JLab store
+(<code>root://dtn2304.jlab.org:8443</code>,
+<code>/jlab-osdf-ro/eic/EPIC/volatile</code>) has campaigns up to
+25.10.x.</li>
 </ul></section><section><h2 class="section-heading" id="verifying-your-own-setup">Verifying your own setup<a class="anchor" aria-label="anchor" href="#verifying-your-own-setup"></a>
 </h2>
 <hr class="half-width">
@@ -444,9 +483,8 @@ the same peak in uproot, RDataFrame, TTreeReader, and PODIO.</p>
 </h2>
 <hr class="half-width">
 <p>The Setup page’s assistant table dates quickly. Pricing and free
-tiers change often — check current vendor docs before teaching, and
-update the table. The <em>MCP</em> portability message is the stable
-part.</p>
+tiers change often; check the vendor docs before teaching and update the
+table.</p>
 <!--
 Place links that you need to refer to multiple times across pages here. Delete
 any links that you are not going to use.
@@ -478,7 +516,7 @@ any links that you are not going to use.
         <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/" class="external-link">varnish (1.1.1)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.21.1)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/" class="external-link">varnish (1.1.3)</a></p>
 		</div>
 		</footer>
 </div> <!-- / div.container -->
@@ -501,8 +539,8 @@ any links that you are not going to use.
   "url": "https://eic.github.io/tutorial-mcp/instructor-notes.html",
   "identifier": "https://eic.github.io/tutorial-mcp/instructor-notes.html",
   "dateCreated": "2026-06-04",
-  "dateModified": "2026-08-25",
-  "datePublished": "2026-08-25"
+  "dateModified": "2026-11-09",
+  "datePublished": "2026-11-09"
 }
 
   </script><script>

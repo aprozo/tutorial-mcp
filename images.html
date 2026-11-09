@@ -40,7 +40,10 @@
   <div class="container-fluid top-nav-container">
     <div class="col-md-8">
       <div class="large-logo">
-        <img id="incubator-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo.svg"><span class="badge text-bg-info">
+        <a href="index.html">
+        <img id="incubator-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo.svg"></a>
+
+        <span class="badge text-bg-info">
           <abbr title="This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.">
             <a href="https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html" class="external-link alert-link">
               <i aria-hidden="true" class="icon" data-feather="alert-circle" style="border-radius: 5px"></i>
@@ -96,8 +99,9 @@
       <span class="menu-title">Menu</span>
     </button>
     <div class="nav-logo">
-      <img class="small-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo-sm.svg">
-</div>
+      <a href="index.html">
+      <img class="small-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo-sm.svg"></a>
+    </div>
     <div class="lesson-title-md">
       Generative AI for Physics Analysis
     </div>
@@ -127,9 +131,6 @@
             More <i data-feather="chevron-down"></i>
           </button>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-<li><a class="dropdown-item" href="about-the-physics.html">Physics reference: Λ⁰ → p π⁻</a></li>
-<li><a class="dropdown-item" href="analysis-approaches.html">Alternative Analysis Approaches</a></li>
-<li><a class="dropdown-item" href="discuss.html">Discussion</a></li>
 <li><a class="dropdown-item" href="reference.html">Reference</a></li>
           </ul>
 </li>
@@ -145,7 +146,7 @@
       </fieldset>
     </form>
     -->
-    <a id="search-button" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
+    <a id="search-button-nav" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div>
 <!--/div.container-fluid -->
 </nav><div class="container">
@@ -157,6 +158,9 @@
           <i class="search-icon" data-feather="x" role="img"></i>
         </button>
         <div class="sidebar-inner">
+          <div class="row mobile-row" id="theme-row-mobile">
+            <a id="search-button-sidebar" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
+          </div>
           <div class="row mobile-row" id="theme-row-mobile">
             <menu class="col theme-selector" id="theme-selector-sidebar">
 <li class="nav-item dropdown theme-button-list" id="theme-button-list-sidebar">
@@ -205,6 +209,7 @@
 <!--/div.accordion-item-->
                 </div>
 <!--/div.accordion-flush-->
+
               </div>
 <!--div.sidenav-view-selector -->
             </div>
@@ -299,7 +304,7 @@
 <div class="accordion accordion-flush" id="accordionFlush7">
   <div class="accordion-item">
     <div class="accordion-header" id="flush-heading7">
-        <a href="06-eic-mcp-servers.html">6. Catalogue: MCP servers and AI infrastructure in the EIC ecosystem</a>
+        <a href="06-eic-mcp-servers.html">6. Catalog: MCP servers and AI infrastructure in the EIC ecosystem</a>
     </div>
 <!--/div.accordion-header-->
 
@@ -313,6 +318,34 @@
             </div>
 
             <hr class="half-width">
+<div class="accordion accordion-flush" id="accordion-links-toggle">
+                <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-heading-links-toggle">
+                  <button class="accordion-button collapsed" id="links" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-links-toggle" aria-expanded="false" aria-controls="flush-collapse-links-toggle">
+                    LINKS
+                  </button>
+                </h2>
+                <div id="flush-collapse-links-toggle" class="accordion-collapse show collapse" data-bs-parent="#accordion-links-toggle">
+                    <div class="accordion-body">
+                        <ul>
+<li>
+                            <a href="key-points.html">Key Points</a>
+                            </li>
+                            <li>
+                            <a href="reference.html#glossary">Glossary</a>
+                            </li>
+                            <li>
+                            <a href="profiles.html">Learner Profiles</a>
+                            </li>
+                        </ul>
+</div>
+                </div>
+                </div>
+<!--/div.accordion-item-->
+            </div>
+<!--/div.accordion-flush-->
+
+            <hr class="half-width">
 <div class="accordion accordion-flush lesson-resources" id="accordion-resources-toggle">
               <div class="accordion-item">
                 <h2 class="accordion-header" id="flush-heading-resources-toggle">
@@ -323,18 +356,6 @@
                 <div id="flush-collapse-resources-toggle" class="accordion-collapse collapse" data-bs-parent="#accordion-resources-toggle">
                   <div class="accordion-body">
                     <ul>
-<li>
-                        <a href="key-points.html">Key Points</a>
-                      </li>
-                      <li>
-                        <a href="reference.html#glossary">Glossary</a>
-                      </li>
-                      <li>
-                        <a href="profiles.html">Learner Profiles</a>
-                      </li>
-                      <li><a href="about-the-physics.html">Physics reference: Λ⁰ → p π⁻</a></li>
-<li><a href="analysis-approaches.html">Alternative Analysis Approaches</a></li>
-<li><a href="discuss.html">Discussion</a></li>
 <li><a href="reference.html">Reference</a></li>
                     </ul>
 </div>
@@ -378,9 +399,9 @@ file</div>
 <hr class="half-width">
 <h3 id="05-end-to-end-agents-figure-1">Figure 1</h3>
 <p aria-hidden="true">Image 1 of 1: ‘Proton–pion invariant-mass spectrum with Gaussian-plus-polynomial fits showing clear Lambda and anti-Lambda peaks near 1.1157 GeV’</p>
-<figure><img src="fig/lambda_fit.svg" alt="Proton–pion invariant-mass spectrum with Gaussian-plus-polynomial fits showing clear Lambda and anti-Lambda peaks near 1.1157 GeV" class="figure mx-auto d-block"><div class="figcaption">Fitted Λ⁰ and Λ̄ invariant-mass spectra (100-file
-reference)</div>
-</figure><hr></section><section id="06-eic-mcp-servers"><h2 class="section-heading"><a href="06-eic-mcp-servers.html">Catalogue: MCP servers and AI infrastructure in the EIC ecosystem</a></h2>
+<figure><img src="fig/lambda_fit.svg" alt="Proton–pion invariant-mass spectrum with Gaussian-plus-polynomial fits showing clear Lambda and anti-Lambda peaks near 1.1157 GeV" class="figure mx-auto d-block"><div class="figcaption">Fitted Λ⁰ and Λ̄ invariant-mass spectra
+(reference fit)</div>
+</figure><hr></section><section id="06-eic-mcp-servers"><h2 class="section-heading"><a href="06-eic-mcp-servers.html">Catalog: MCP servers and AI infrastructure in the EIC ecosystem</a></h2>
 <hr class="half-width">
 <h3 id="06-eic-mcp-servers-figure-1">Figure 1</h3>
 <p aria-hidden="true">Image 1 of 1: ‘uproot logo’</p>
@@ -397,10 +418,6 @@ reference)</div>
 <h3 id="06-eic-mcp-servers-figure-4">Figure 4</h3>
 <p aria-hidden="true">Image 1 of 1: ‘Zenodo logo’</p>
 <figure><img src="fig/logos/zenodo.png" class="mcp-logo figure mx-auto d-block" alt="Zenodo logo"><div class="figcaption">Zenodo logo</div>
-</figure><hr>
-<h3 id="06-eic-mcp-servers-figure-5">Figure 5</h3>
-<p aria-hidden="true">Image 1 of 1: ‘Indico logo’</p>
-<figure><img src="fig/logos/indico.png" class="mcp-logo figure mx-auto d-block" alt="Indico logo"><div class="figcaption">Indico logo</div>
 </figure><hr></section>
 </div>
     </main>
@@ -428,7 +445,7 @@ reference)</div>
         <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/" class="external-link">varnish (1.1.1)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.21.1)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/" class="external-link">varnish (1.1.3)</a></p>
 		</div>
 		</footer>
 </div> <!-- / div.container -->
@@ -451,8 +468,8 @@ reference)</div>
   "url": "https://eic.github.io/tutorial-mcp/images.html",
   "identifier": "https://eic.github.io/tutorial-mcp/images.html",
   "dateCreated": "2026-06-04",
-  "dateModified": "2026-08-25",
-  "datePublished": "2026-08-25"
+  "dateModified": "2026-11-09",
+  "datePublished": "2026-11-09"
 }
 
   </script><script>

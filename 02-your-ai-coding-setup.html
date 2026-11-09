@@ -24,7 +24,10 @@
   <div class="container-fluid top-nav-container">
     <div class="col-md-8">
       <div class="large-logo">
-        <img id="incubator-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo.svg"><span class="badge text-bg-info">
+        <a href="index.html">
+        <img id="incubator-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo.svg"></a>
+
+        <span class="badge text-bg-info">
           <abbr title="This lesson is in the beta phase, which means that it is ready for teaching by instructors outside of the original author team.">
             <a href="https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html" class="external-link alert-link">
               <i aria-hidden="true" class="icon" data-feather="alert-circle" style="border-radius: 5px"></i>
@@ -74,7 +77,9 @@
       <span class="menu-title">Menu</span>
     </button>
     <div class="nav-logo">
-      <img class="small-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo-sm.svg"></div>
+      <a href="index.html">
+      <img class="small-logo" alt="Generative AI for ePIC physics analysis" src="assets/images/incubator-logo-sm.svg"></a>
+    </div>
     <div class="lesson-title-md">
       Generative AI for Physics Analysis
     </div>
@@ -102,7 +107,7 @@
           <button class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             More <i data-feather="chevron-down"></i>
           </button>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown"><li><a class="dropdown-item" href="about-the-physics.html">Physics reference: Λ⁰ → p π⁻</a></li><li><a class="dropdown-item" href="analysis-approaches.html">Alternative Analysis Approaches</a></li><li><a class="dropdown-item" href="discuss.html">Discussion</a></li><li><a class="dropdown-item" href="reference.html">Reference</a></li>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown"><li><a class="dropdown-item" href="reference.html">Reference</a></li>
           </ul></li>
       </ul></div>
     <!--
@@ -115,7 +120,7 @@
       </fieldset>
     </form>
     -->
-    <a id="search-button" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
+    <a id="search-button-nav" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
   </div><!--/div.container-fluid -->
 </nav><aside class="col-md-12 lesson-progress"><div class="progress incubator">
     <div class="progress-bar incubator" role="progressbar" style="width: 21%" aria-valuenow="21" aria-valuemin="0" aria-valuemax="100" aria-label="Lesson Progress">21%</div>
@@ -129,6 +134,9 @@
           <i class="search-icon" data-feather="x" role="img"></i>
         </button>
         <div class="sidebar-inner">
+          <div class="row mobile-row" id="theme-row-mobile">
+            <a id="search-button-sidebar" class="btn btn-primary" href="aio.html" role="button" aria-label="Search the All In One page">Search the All In One page</a>
+          </div>
           <div class="row mobile-row" id="theme-row-mobile">
             <menu class="col theme-selector" id="theme-selector-sidebar"><li class="nav-item dropdown theme-button-list" id="theme-button-list-sidebar">
                 <button class="btn btn-link nav-link px-0 px-lg-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme (auto)">
@@ -171,6 +179,7 @@
                     </div>
                   </div><!--/div.accordion-item-->
                 </div><!--/div.accordion-flush-->
+
               </div><!--div.sidenav-view-selector -->
             </div><!--/div.col -->
 
@@ -256,7 +265,7 @@
 <div class="accordion accordion-flush" id="accordionFlush7">
   <div class="accordion-item">
     <div class="accordion-header" id="flush-heading7">
-        <a href="06-eic-mcp-servers.html">6. Catalogue: MCP servers and AI infrastructure in the EIC ecosystem</a>
+        <a href="06-eic-mcp-servers.html">6. Catalog: MCP servers and AI infrastructure in the EIC ecosystem</a>
     </div><!--/div.accordion-header-->
 
   </div><!--/div.accordion-item-->
@@ -265,6 +274,29 @@
                 </div>
               </div>
             </div>
+
+            <hr class="half-width"><div class="accordion accordion-flush" id="accordion-links-toggle">
+                <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-heading-links-toggle">
+                  <button class="accordion-button collapsed" id="links" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-links-toggle" aria-expanded="false" aria-controls="flush-collapse-links-toggle">
+                    LINKS
+                  </button>
+                </h2>
+                <div id="flush-collapse-links-toggle" class="accordion-collapse show collapse" data-bs-parent="#accordion-links-toggle">
+                    <div class="accordion-body">
+                        <ul><li>
+                            <a href="key-points.html">Key Points</a>
+                            </li>
+                            <li>
+                            <a href="reference.html#glossary">Glossary</a>
+                            </li>
+                            <li>
+                            <a href="profiles.html">Learner Profiles</a>
+                            </li>
+                        </ul></div>
+                </div>
+                </div><!--/div.accordion-item-->
+            </div><!--/div.accordion-flush-->
 
             <hr class="half-width"><div class="accordion accordion-flush lesson-resources" id="accordion-resources-toggle">
               <div class="accordion-item">
@@ -275,16 +307,7 @@
                 </h2>
                 <div id="flush-collapse-resources-toggle" class="accordion-collapse collapse" data-bs-parent="#accordion-resources-toggle">
                   <div class="accordion-body">
-                    <ul><li>
-                        <a href="key-points.html">Key Points</a>
-                      </li>
-                      <li>
-                        <a href="reference.html#glossary">Glossary</a>
-                      </li>
-                      <li>
-                        <a href="profiles.html">Learner Profiles</a>
-                      </li>
-                      <li><a href="about-the-physics.html">Physics reference: Λ⁰ → p π⁻</a></li><li><a href="analysis-approaches.html">Alternative Analysis Approaches</a></li><li><a href="discuss.html">Discussion</a></li><li><a href="reference.html">Reference</a></li>
+                    <ul><li><a href="reference.html">Reference</a></li>
                     </ul></div>
                 </div>
               </div>
@@ -311,16 +334,16 @@
       <div class="d-none d-sm-none d-md-block">
         <a class="chapter-link" href="01-why-genai-for-physics.html" rel="prev">
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>
-          Previous: Generative AI as an
+          Previous: Generative AI as an agentic research...
         </a>
         <a class="chapter-link float-end" href="03-mcp-servers.html" rel="next">
-          Next: Tool servers and the...
+          Next: Tool servers and the Model Context...
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i>
         </a>
       </div>
     </nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>The measurement: Λ⁰ → p π⁻</h1>
-        <p>Last updated on 2026-07-10 |
+        <p>Last updated on 2026-11-09 |
 
         <a href="https://github.com/eic/tutorial-mcp/edit/main/episodes/02-your-ai-coding-setup.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -371,23 +394,24 @@ background?</li>
 <h3 class="card-title">Objectives</h3>
 <ul><li>Compute m(p, π) by hand from the four momentum branches and the PDG
 masses.</li>
-<li>Sketch the expected spectrum — peak position, width scale,
-background shape — before touching data.</li>
+<li>Sketch the expected spectrum (peak position, width scale, background
+shape) before looking at data.</li>
 </ul></div>
 </div>
 </div>
 </div>
 </div>
-<p>You install an assistant and the tool servers on the <a href="index.html#setup">Setup</a> page. This episode is the physics you will
-reconstruct in <a href="03-mcp-servers.html">Episode 3</a>.</p>
+<p>The <a href="index.html#setup">Setup</a> page covers the servers and the
+assistant. This episode describes the physics you reconstruct starting
+in <a href="03-mcp-servers.html">Episode 3</a>.</p>
 <section><h2 class="section-heading" id="the-decay">The decay<a class="anchor" aria-label="anchor" href="#the-decay"></a></h2>
 <hr class="half-width"><p>The Λ⁰ is the lightest strange baryon (uds, spin-parity ½⁺). It
 decays only weakly (a strangeness-changing ΔS = 1 transition), so it is
 long-lived: cτ ≈ 7.9 cm. Its dominant hadronic mode is</p>
 <pre><code>Λ⁰ → p + π⁻      (branching fraction ≈ 63.9%)</code></pre>
-<p>The macroscopic lifetime makes the decay a <strong>V0</strong>: two
-oppositely charged tracks from a vertex displaced from the primary
-interaction point.</p>
+<p>The centimeter-scale flight distance makes the decay a
+<strong>V0</strong>: two oppositely charged tracks from a vertex
+displaced from the primary interaction point.</p>
 <pre class="mermaid"><code>%%{init: {'theme':'base', 'themeVariables': {'fontSize':'15px','lineColor':'#94a3b8','edgeLabelBackground':'#e2e8f0','clusterBkg':'#1f293720','clusterBorder':'#94a3b8','titleColor':'#94a3b8'}}}%%
 flowchart LR
     accTitle: {Lambda to proton pion V0 decay}
@@ -424,18 +448,19 @@ GeV</strong>.</p>
 <div class="callout-content">
 <p>The Λ⁰ natural width (<span class="math inline">\(\Gamma = \hbar/\tau
 \approx 2.5 \times 10^{-6}\)</span> eV) is far below any detector
-effect. The observed peak width — a few MeV — measures <strong>detector
-momentum and angular resolution</strong>, not the particle.</p>
+effect. The observed peak width, a few MeV, measures the
+<strong>detector momentum and angular resolution</strong>, not the
+particle.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="section level3">
 <h3 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a></h3>
-<p>Most proton–pion pairs share no common Λ⁰. These random
+<p>Most proton–pion pairs do not come from a Λ⁰ at all. These random
 (“combinatorial”) pairs do not peak; they form a smooth distribution
 under the signal. The analysis extracts a yield by fitting a Gaussian
-peak on a low-order polynomial background (<a href="05-end-to-end-agents.html">Episode 5</a>). The charge-conjugate
+peak on top of a low-order polynomial background (<a href="05-end-to-end-agents.html">Episode 5</a>). The charge-conjugate
 mode Λ̄ → p̄ π⁺ is reconstructed identically with the antiparticles.</p>
 <div id="reference-values-pdg" class="callout">
 <div class="callout-square">
@@ -477,28 +502,14 @@ reconstructed charged tracks, and four members:</p>
 assigns each track. Select protons (<code>2212</code>) and π⁻
 (<code>-211</code>) for Λ⁰, antiprotons (<code>-2212</code>) and π⁺
 (<code>211</code>) for Λ̄.</p>
-<div id="caveat-pid-is-a-hypothesis-too" class="callout">
-<div class="callout-square">
-<i class="callout-icon" data-feather="bell"></i>
-</div>
-<span class="callout-header">Callout</span>
-<div id="caveat-pid-is-a-hypothesis-too" class="callout-inner">
-<h3 class="callout-title">Caveat: PID is a hypothesis too</h3>
-<div class="callout-content">
-<p>The <code>PDG</code> field is the reconstruction’s best guess, not
-truth. Misidentification feeds the combinatorial background — one reason
-a fit, not a count, is required.</p>
-</div>
-</div>
-</div>
 <p>You do not download a file. In <a href="03-mcp-servers.html">Episode
 3</a> the assistant uses the <a href="https://github.com/eic/rucio-eic-mcp-server" class="external-link"><strong>rucio</strong></a>
 tools to find a DIS dataset and <a href="https://github.com/eic/xrootd-mcp-server" class="external-link"><strong>xrootd</strong></a>
 to verify its files, then reads one of the dataset’s
 <code>root://</code> URLs
-(e.g. <code>root://dtn-eic.jlab.org//...</code>) <strong>in
+(e.g. <code>root://epicxrd1.sdcc.bnl.gov:1095//...</code>) <strong>in
 place</strong> with the <a href="https://github.com/eic/uproot-mcp-server" class="external-link"><strong>uproot</strong></a>
-tools — pulling exactly these branches without writing any I/O code.</p>
+tools. It reads these branches without you writing any I/O code.</p>
 <div id="keypoints1" class="callout keypoints">
 <div class="callout-square">
 <i class="callout-icon" data-feather="key"></i>
@@ -506,12 +517,9 @@ tools — pulling exactly these branches without writing any I/O code.</p>
 <span class="callout-header">Key Points</span>
 <div class="callout-inner">
 <div class="callout-content">
-<ul><li>The observable is the p π⁻ invariant mass; the Λ⁰ appears as a
-narrow peak over a combinatorial background.</li>
-<li>The peak width is set by detector resolution, not the negligible Λ⁰
-natural width.</li>
-<li>The data are EDM4eic collections in an <code>events</code> tree;
-momenta are in GeV.</li>
+<ul><li>The Λ⁰ shows up as a peak at 1.1157 GeV in the proton–pion invariant
+mass.</li>
+<li>The peak width comes from detector resolution.</li>
 </ul></div>
 </div>
 </div>
@@ -528,10 +536,10 @@ any links that you are not going to use.
       <div class="d-none d-sm-none d-md-block">
         <a class="chapter-link" href="01-why-genai-for-physics.html" rel="prev">
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>
-          Previous: Generative AI as an
+          Previous: Generative AI as an agentic research...
         </a>
         <a class="chapter-link float-end" href="03-mcp-servers.html" rel="next">
-          Next: Tool servers and the...
+          Next: Tool servers and the Model Context...
           <i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i>
         </a>
       </div>
@@ -557,7 +565,7 @@ any links that you are not going to use.
         <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a></p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.20.2)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/" class="external-link">varnish (1.1.1)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.21.1)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/carpentries/varnish/tree/" class="external-link">varnish (1.1.3)</a></p>
 		</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -579,8 +587,8 @@ any links that you are not going to use.
   "url": "https://eic.github.io/tutorial-mcp/02-your-ai-coding-setup.html",
   "identifier": "https://eic.github.io/tutorial-mcp/02-your-ai-coding-setup.html",
   "dateCreated": "2026-06-04",
-  "dateModified": "2026-07-10",
-  "datePublished": "2026-08-25"
+  "dateModified": "2026-11-09",
+  "datePublished": "2026-11-09"
 }
 
   </script><script>
